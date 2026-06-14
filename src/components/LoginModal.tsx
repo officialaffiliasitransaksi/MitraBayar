@@ -7,7 +7,8 @@ import {
   Lock, 
   ArrowRight, 
   AlertCircle,
-  HelpCircle
+  HelpCircle,
+  Settings
 } from 'lucide-react';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -15,11 +16,11 @@ import { auth } from '../firebase';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: (role: 'customer' | 'marketing' | 'manager', identifier: string) => void;
+  onLoginSuccess: (role: 'customer' | 'marketing' | 'manager' | 'admin', identifier: string) => void;
 }
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
-  const [activeTab, setActiveTab] = useState<'customer' | 'marketing' | 'manager'>('customer');
+  const [activeTab, setActiveTab] = useState<'customer' | 'marketing' | 'manager' | 'admin'>('customer');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -34,6 +35,10 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
   const [managerPass, setManagerPass] = useState('');
   const [managerPin, setManagerPin] = useState('');
 
+  const [adminId, setAdminId] = useState('');
+  const [adminPass, setAdminPass] = useState('');
+  const [adminPin, setAdminPin] = useState('');
+
   if (!isOpen) return null;
 
   const handleAutofill = () => {
@@ -44,10 +49,14 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
     } else if (activeTab === 'marketing') {
       setMarketingId('MB-7789');
       setMarketingPass('mitrasuksestransaksi');
-    } else {
+    } else if (activeTab === 'manager') {
       setManagerId('MGR-9902');
       setManagerPass('managerpembayaran');
       setManagerPin('8899');
+    } else if (activeTab === 'admin') {
+      setAdminId('ADM-1002');
+      setAdminPass('adminpembayaran');
+      setAdminPin('1122');
     }
   };
 
@@ -68,6 +77,9 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           onClose();
         } else if (activeTab === 'manager') {
           onLoginSuccess('manager', managerId.toUpperCase());
+          onClose();
+        } else if (activeTab === 'admin') {
+          onLoginSuccess('admin', adminId.toUpperCase());
           onClose();
         }
       };
@@ -110,6 +122,22 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
           setLoading(false);
           return;
         }
+      } else if (activeTab === 'admin') {
+        if (!adminId.trim()) {
+          setError('ID Admin tidak boleh kosong.');
+          setLoading(false);
+          return;
+        }
+        if (adminPass.length < 6) {
+          setError('Sandi admin tidak boleh kosong.');
+          setLoading(false);
+          return;
+        }
+        if (!adminPin) {
+          setError('PIN Admin wajib diisi.');
+          setLoading(false);
+          return;
+        }
       }
 
       // Sync user session to Firebase Auth for secure cloud rule evaluation
@@ -124,7 +152,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
     }, 850);
   };
 
-  const handleTabChange = (tab: 'customer' | 'marketing' | 'manager') => {
+  const handleTabChange = (tab: 'customer' | 'marketing' | 'manager' | 'admin') => {
     setActiveTab(tab);
     setError(null);
   };
@@ -150,44 +178,57 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
         </div>
 
         {/* Tab Selector */}
-        <div className="p-4 bg-gray-50/50 border-b border-gray-100 flex gap-2">
+        <div className="p-4 bg-gray-50/50 border-b border-gray-100 grid grid-cols-2 sm:flex gap-2">
           <button
             type="button"
             onClick={() => handleTabChange('customer')}
-            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition-all ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2 px-3 rounded-xl font-bold text-xs transition-all ${
               activeTab === 'customer' 
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/10' 
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <Smartphone size={16} />
+            <Smartphone size={15} />
             <span>Kreditur</span>
           </button>
           
           <button
             type="button"
             onClick={() => handleTabChange('marketing')}
-            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition-all ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2 px-3 rounded-xl font-bold text-xs transition-all ${
               activeTab === 'marketing' 
                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/10' 
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <TrendingUp size={16} />
-            <span>Marketing Finance</span>
+            <TrendingUp size={15} />
+            <span>Marketing</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleTabChange('manager')}
-            className={`flex-1 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition-all ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2 px-3 rounded-xl font-bold text-xs transition-all ${
               activeTab === 'manager' 
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/10' 
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <ShieldCheck size={16} />
-            <span>Manager Finance</span>
+            <ShieldCheck size={15} />
+            <span>Manager</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange('admin')}
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 py-2 px-3 rounded-xl font-bold text-xs transition-all ${
+              activeTab === 'admin' 
+                ? 'bg-slate-800 text-white shadow-md shadow-slate-800/20' 
+                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <Settings size={15} />
+            <span>Admin Panel</span>
           </button>
         </div>
 
@@ -349,6 +390,61 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
             </div>
           )}
 
+          {/* Admin Tab Panel */}
+          {activeTab === 'admin' && (
+            <div className="space-y-4">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 flex gap-2.5">
+                <Settings size={18} className="text-slate-600 mt-0.5 flex-shrink-0" />
+                <p>
+                  Konsol Administrator Pusat Mitra Bayar. Kelola parameter global, konfigurasi denda, komisi pemasaran, dan data kemitraan.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">ID Admin / Super User</label>
+                <div className="relative">
+                  <Smartphone className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: ADM-1002"
+                    value={adminId}
+                    onChange={(e) => setAdminId(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none transition-all text-sm font-semibold uppercase placeholder:normal-case"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Sandi Admin</label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
+                  <input
+                    type="password"
+                    required
+                    placeholder="Masukkan sandi administrator"
+                    value={adminPass}
+                    onChange={(e) => setAdminPass(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none transition-all text-sm font-medium"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">PIN Otorisasi Rahasia (4-digit)</label>
+                <input
+                  type="password"
+                  maxLength={4}
+                  required
+                  placeholder="PIN"
+                  value={adminPin}
+                  onChange={(e) => setAdminPin(e.target.value.replace(/\D/g, ''))}
+                  className="w-1/3 text-center tracking-widest py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none transition-all text-sm font-bold text-slate-800"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Quick Simulation Trigger */}
           <div className="pt-2">
             <button
@@ -370,7 +466,9 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
                 ? 'bg-blue-600 hover:bg-blue-700 hover:shadow-blue-600/20' 
                 : activeTab === 'marketing'
                 ? 'bg-emerald-600 hover:bg-emerald-700 hover:shadow-emerald-600/20'
-                : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-indigo-600/20'
+                : activeTab === 'manager'
+                ? 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-indigo-600/20'
+                : 'bg-slate-850 hover:bg-slate-900 hover:shadow-slate-800/20'
             }`}
           >
             {loading ? (
@@ -382,7 +480,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
               </>
             )}
           </button>
-
         </form>
 
         {/* Footer info decoration */}

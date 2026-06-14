@@ -127,7 +127,7 @@ export const MitraBayarLogo = ({
 interface HeaderProps {
   onOpenLogin: () => void;
   isLoggedIn: boolean;
-  userRole: 'customer' | 'marketing' | 'manager' | null;
+  userRole: 'customer' | 'marketing' | 'manager' | 'admin' | null;
   onLogout: () => void;
 }
 
@@ -177,7 +177,13 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
               <div className="flex items-center gap-3">
                 <span className="text-xs px-3 py-1.5 bg-blue-50 text-blue-800 font-bold rounded-lg uppercase tracking-wider border border-blue-100 flex items-center gap-1">
                   <User size={13} />
-                  {userRole === 'customer' ? 'Kreditur' : userRole === 'marketing' ? 'Marketing Finance' : 'Manager Finance'} Portal
+                  {userRole === 'customer' 
+                    ? 'Kreditur' 
+                    : userRole === 'marketing' 
+                    ? 'Marketing Finance' 
+                    : userRole === 'manager' 
+                    ? 'Manager Finance' 
+                    : 'Global Admin'} Portal
                 </span>
                 <button 
                   onClick={onLogout}
@@ -234,7 +240,13 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
                 <span className="text-slate-500 font-medium">Masuk Sebagai:</span>
                 <span className="font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-1">
                   <User size={14} />
-                  {userRole === 'customer' ? 'Kreditur' : userRole === 'marketing' ? 'Marketing Finance' : 'Manager Finance'}
+                  {userRole === 'customer' 
+                    ? 'Kreditur' 
+                    : userRole === 'marketing' 
+                    ? 'Marketing Finance' 
+                    : userRole === 'manager' 
+                    ? 'Manager Finance' 
+                    : 'Global Admin'}
                 </span>
               </div>
               <button 
@@ -274,7 +286,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
 
 const HeroSection = ({ onOpenLogin }: { onOpenLogin: () => void }) => {
   return (
-    <section id="home" className="pt-28 pb-16 lg:pt-36 lg:pb-24 bg-gradient-to-br from-[#e8fbf3] via-[#f7fdfb] to-[#ecfbf7] overflow-hidden min-h-[95vh] flex items-center relative">
+    <section id="home" className="pt-28 pb-16 lg:pt-36 lg:pb-24 bg-gradient-to-br from-[#dbeafe] via-[#f0f9ff] to-[#bfdbfe]/50 overflow-hidden min-h-[95vh] flex items-center relative">
       
       {/* Glossy 3D Glassmorphic Green Spheres (matching the uploaded image's signature style) */}
       <div 
@@ -318,7 +330,7 @@ const HeroSection = ({ onOpenLogin }: { onOpenLogin: () => void }) => {
             </h1>
             
             <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-5 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              Unduh Mitra Bayar, selesaikan transaksi harian Anda, dan nikmati ketenangan pikiran tanpa denda leasing. Cukup rutin bertransaksi, kendaraan Anda otomatis terlindungi.
+              Ayo segera download Aplikasi Mitra Bayar, lakukan rutinitas transaksi bulanan anda, dan nikmati ketenangan pikiran tanpa denda di lembaga Finance, kendaraan Anda otomatis terlindungi.
             </p>
             
             {/* PlayStore & AppStore Badge Rows */}
@@ -645,7 +657,7 @@ const ComparisonTable = () => {
   ];
 
   return (
-    <section className="py-20 md:py-28 bg-[#fafbfe] border-t border-b border-slate-100 relative overflow-hidden">
+    <section className="py-20 md:py-28 bg-gradient-to-b from-[#f0f9ff] via-[#e2f1fc]/85 to-[#f0f9ff] border-t border-b border-blue-100 relative overflow-hidden">
       {/* Dynamic Background Accents */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-100/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -793,7 +805,7 @@ const ProgramDetails = () => {
   ];
 
   return (
-    <section id="program" className="py-16 md:py-24 bg-gray-50/50">
+    <section id="program" className="py-16 md:py-24 bg-gradient-to-b from-[#f0f9ff]/50 via-[#e0f2fe]/40 to-[#f0f9ff]/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Program Apresiasi Customer <span className="text-blue-600">Reward Loyalitas</span></h2>
@@ -847,51 +859,50 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-16 md:py-24 bg-[#0a1930] text-white relative overflow-hidden">
+    <section id="how-it-works" className="py-16 md:py-24 bg-gradient-to-br from-[#dbeafe] via-[#f0f9ff] to-[#bfdbfe] text-slate-800 relative overflow-hidden border-t border-b border-blue-100">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 opacity-10 pointer-events-none">
         <svg width="400" height="400" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <circle cx="100" cy="0" r="100" fill="currentColor"/>
         </svg>
       </div>
-      <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-blue-900/50 to-transparent pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16 md:mb-20">
-          <span className="inline-block py-1 px-3 rounded-full bg-blue-800/50 border border-blue-700 text-green-400 font-semibold tracking-wider text-xs sm:text-sm mb-4">JALAN PINTAS BEBAS DENDA</span>
-          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4">Selamatkan Kendaraan Anda dari Denda Leasing!</h2>
-          <p className="text-blue-200 max-w-2xl mx-auto text-base sm:text-lg">4 Langkah mudah mengaktifkan Dana Sementara Anda.</p>
+          <span className="inline-block py-1 px-3 rounded-full bg-blue-100 border border-blue-200 text-blue-700 font-semibold tracking-wider text-xs sm:text-sm mb-4">CARA CERDAS BEBAS DENDA</span>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-[#0d2e5c]">Selamatkan Aset jaminan anda di Pembiayaan</h2>
+          <p className="text-slate-600 max-w-2xl mx-auto text-base sm:text-lg">4 Langkah mudah mengaktifkan Dana Sementara Anda.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-8 relative">
           {/* Connector Line (Desktop Only) */}
-          <div className="hidden lg:block absolute top-[2.5rem] left-[12%] w-[76%] h-0.5 bg-blue-800">
-             <div className="h-full bg-green-500 w-full opacity-50"></div>
+          <div className="hidden lg:block absolute top-[2.5rem] left-[12%] w-[76%] h-0.5 bg-blue-200">
+             <div className="h-full bg-blue-400 w-full opacity-50"></div>
           </div>
           
           {steps.map((step, index) => (
             <div key={index} className="relative z-10 flex flex-col items-center text-center group">
-              <div className="w-20 h-20 rounded-2xl bg-[#0d2342] border-2 border-blue-600 group-hover:border-green-400 flex items-center justify-center text-green-400 mb-6 shadow-xl shadow-blue-900/50 transition-all duration-300 relative">
+              <div className="w-20 h-20 rounded-2xl bg-white border-2 border-blue-500 group-hover:border-emerald-500 flex items-center justify-center text-blue-600 mb-6 shadow-md transition-all duration-300 relative">
                 {step.icon}
-                <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold border-4 border-[#0a1930]">
+                <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold border-4 border-white">
                   {step.number}
                 </div>
               </div>
-              <h3 className="text-lg md:text-xl font-bold mb-3 text-white">{step.title}</h3>
-              <p className="text-blue-200 text-sm leading-relaxed max-w-[250px]">{step.description}</p>
+              <h3 className="text-lg md:text-xl font-bold mb-3 text-[#0d2e5c]">{step.title}</h3>
+              <p className="text-slate-600 text-sm leading-relaxed max-w-[250px]">{step.description}</p>
             </div>
           ))}
         </div>
 
         <div className="mt-16 md:mt-24 text-center px-4 sm:px-0 flex justify-center">
-          <div className="bg-blue-900/40 border border-blue-700/50 rounded-2xl p-6 sm:p-8 max-w-3xl backdrop-blur-sm relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-1 h-full bg-green-500"></div>
-            <h4 className="font-bold text-lg sm:text-xl mb-4 flex flex-col sm:flex-row items-center justify-center gap-2">
+          <div className="bg-white/80 border border-blue-200 rounded-2xl p-6 sm:p-8 max-w-3xl backdrop-blur-sm relative overflow-hidden shadow-sm">
+             <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+            <h4 className="font-bold text-lg sm:text-xl mb-4 flex flex-col sm:flex-row items-center justify-center gap-2 text-[#0d2e5c]">
                Transaksi Apa Saja yang Dihitung?
             </h4>
-            <p className="text-blue-100 text-sm md:text-base leading-relaxed text-center">
-              Semua layanan PPOB dihitung! Namun <strong className="text-white bg-green-500/20 px-2 py-1 rounded border border-green-500/30 font-bold mx-1">Sangat Diutamakan Membayar Angsuran Kendaraan (Leasing) Bulanan</strong>, Token PLN, Pulsa & Data, BPJS, PDAM, dsb di aplikasi. <br className="hidden sm:block mt-2"/>
-              <span className="text-xs text-blue-300/80 mt-3 block">*(Transfer sesama akun Mitra Bayar tidak dihitung)</span>
+            <p className="text-slate-600 text-sm md:text-base leading-relaxed text-center">
+              Semua layanan PPOB dihitung! Namun <strong className="text-[#0d2e5c] bg-blue-100/50 px-2 py-1 rounded border border-blue-250 font-bold mx-1">Sangat Diutamakan Membayar Angsuran Kendaraan (Leasing) Bulanan</strong>, Token PLN, Pulsa & Data, BPJS, PDAM, dsb di aplikasi. <br className="hidden sm:block mt-2"/>
+              <span className="text-xs text-slate-400 mt-3 block">*(Transfer sesama akun Mitra Bayar tidak dihitung)</span>
             </p>
           </div>
         </div>
@@ -902,7 +913,7 @@ const HowItWorks = () => {
 
 const EcosystemFlow = () => {
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-white via-[#f0f9ff]/45 to-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">Ekosistem Keamanan Finansial Anda</h2>
@@ -982,7 +993,7 @@ const EcosystemFlow = () => {
 
 const Requirements = () => {
   return (
-    <section id="requirements" className="py-16 md:py-24 bg-gray-50 border-t border-gray-200">
+    <section id="requirements" className="py-16 md:py-24 bg-gradient-to-b from-white via-[#e0f2fe]/45 to-white border-t border-blue-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
           
@@ -1399,7 +1410,7 @@ const Testimony = () => {
   ];
 
   return (
-    <section id="testimony" className="py-16 md:py-24 bg-gradient-to-b from-white via-slate-50 to-zinc-100/80 relative overflow-hidden border-t border-b border-slate-250/50">
+    <section id="testimony" className="py-16 md:py-24 bg-gradient-to-b from-white via-[#e0f2fe]/40 to-white relative overflow-hidden border-t border-b border-blue-100">
       {/* Decorative background grid pattern */}
       <div className="absolute inset-0 opacity-25 pointer-events-none" style={{
         backgroundImage: 'radial-gradient(#10d024 1px, transparent 1px)',
@@ -1413,7 +1424,7 @@ const Testimony = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-12 text-center">
         <span className="text-[#10d024] font-black tracking-widest uppercase text-xs sm:text-sm mb-3 block animate-pulse">Testimoni Kreditur</span>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0d2e5c] tracking-tight leading-tight">
-          Penyelamatan Aset di Seluruh Indonesia
+          Ribuan Kreditur kami bantu penyelesaian Denda Tunggakan
         </h2>
         <p className="text-sm sm:text-base md:text-lg text-slate-500 max-w-2xl mx-auto mt-4 leading-relaxed font-normal">
           Ribuan kreditur dari berbagai kota di Indonesia telah mengaktifkan fasilitas <strong className="text-[#0d2e5c]">Dana Sementara</strong> untuk menyelesaikan tunggakan denda darurat secara aman dan tepercaya.
@@ -1564,7 +1575,7 @@ const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
-    <section id="faq" className="py-16 md:py-24 bg-white">
+    <section id="faq" className="py-16 md:py-24 bg-gradient-to-b from-white via-[#e0f2fe]/30 to-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
           <span className="text-blue-600 font-bold tracking-wider uppercase text-xs sm:text-sm mb-2 block">Pusat Bantuan</span>
@@ -1606,20 +1617,20 @@ const FAQ = () => {
 
 const CTA = () => {
   return (
-    <section id="download" className="py-20 md:py-28 relative bg-blue-600">
+    <section id="download" className="py-20 md:py-28 relative bg-gradient-to-br from-[#dbeafe] via-[#eff6ff] to-[#bfdbfe]">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-72 h-72 md:w-96 md:h-96 bg-blue-500 rounded-full opacity-50 blur-3xl"></div>
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 md:w-96 md:h-96 bg-blue-700 rounded-full opacity-50 blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+        <div className="absolute -top-24 -right-24 w-72 h-72 md:w-96 md:h-96 bg-blue-400 rounded-full opacity-30 blur-3xl"></div>
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 md:w-96 md:h-96 bg-blue-500 rounded-full opacity-30 blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 mix-blend-overlay"></div>
       </div>
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Bangun Kepercayaan Finansial<br className="hidden sm:block"/> Anda Mulai Hari Ini!</h2>
-        <p className="text-blue-100 text-base sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0d2e5c] mb-6 leading-tight">Bangun Kepercayaan Finansial<br className="hidden sm:block"/> Anda Mulai Hari Ini!</h2>
+        <p className="text-slate-600 text-base sm:text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
           Jangan tunggu sampai leasing mengirimkan surat peringatan penarikan unit. Mulai bayar angsuran mobil & motor bulanan Anda di Mitra Bayar sekarang!
         </p>
         <div className="flex flex-col gap-6 items-center justify-center">
-          <p className="text-blue-200 text-sm font-semibold tracking-wider uppercase">Download Aplikasi Mitra Bayar Sekarang juga</p>
+          <p className="text-blue-700 text-sm font-extrabold tracking-wider uppercase">Download Aplikasi Mitra Bayar Sekarang juga</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md">
             {/* Play Store Badge */}
             <a 
@@ -1672,15 +1683,7 @@ const Footer = () => {
             <MitraBayarLogo size={135} showCenteredText={true} textColor="text-white" />
           </div>
 
-          {/* Quick links with elegant hover states */}
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 mb-10 text-sm font-semibold tracking-wider uppercase text-slate-300">
-            <a href="#home" className="hover:text-emerald-400 transition-all hover:scale-105">Beranda</a>
-            <a href="#program" className="hover:text-emerald-400 transition-all hover:scale-105">Program</a>
-            <a href="#how-it-works" className="hover:text-emerald-400 transition-all hover:scale-105">Cara Kerja</a>
-            <a href="#requirements" className="hover:text-emerald-400 transition-all hover:scale-105">Syarat</a>
-            <a href="#testimony" className="hover:text-emerald-400 transition-all hover:scale-105">Testimoni</a>
-            <a href="#faq" className="hover:text-emerald-400 transition-all hover:scale-105">FAQ</a>
-          </div>
+
 
           <div className="w-full border-t border-slate-800/50 mb-10"></div>
 
@@ -1691,15 +1694,7 @@ const Footer = () => {
               <p>© 2026 PT Affiliasi Transaksi Indonesia. Seluruh hak cipta dilindungi undang-undang.</p>
             </div>
             
-            <div className="flex flex-wrap justify-center gap-4">
-              <div className="px-3.5 py-1.5 bg-slate-950/40 border border-slate-800 rounded-lg flex items-center gap-2 shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-slate-300 font-bold tracking-wider text-[10px] uppercase">SSL Secured Connection</span>
-              </div>
-              <div className="px-3.5 py-1.5 bg-slate-950/40 border border-slate-800 rounded-lg flex items-center gap-2 shadow-2xs">
-                <span className="text-slate-300 font-bold tracking-wider text-[10px] uppercase">Bank-Grade Compliance</span>
-              </div>
-            </div>
+
           </div>
 
         </div>
@@ -1711,10 +1706,10 @@ const Footer = () => {
 export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState<'customer' | 'marketing' | 'manager' | null>(null);
+  const [userRole, setUserRole] = useState<'customer' | 'marketing' | 'manager' | 'admin' | null>(null);
   const [userIdentifier, setUserIdentifier] = useState('');
 
-  const handleLoginSuccess = (role: 'customer' | 'marketing' | 'manager', identifier: string) => {
+  const handleLoginSuccess = (role: 'customer' | 'marketing' | 'manager' | 'admin', identifier: string) => {
     setIsLoggedIn(true);
     setUserRole(role);
     setUserIdentifier(identifier);
@@ -1727,7 +1722,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans selection:bg-blue-200 selection:text-blue-900 scroll-smooth">
+    <div className="min-h-screen bg-gradient-to-b from-[#f0f9ff] via-[#e2f1fc] to-[#f8fafc] font-sans selection:bg-blue-200 selection:text-blue-900 scroll-smooth">
       <Header 
         onOpenLogin={() => setIsLoginOpen(true)}
         isLoggedIn={isLoggedIn}

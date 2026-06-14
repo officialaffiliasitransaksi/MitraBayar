@@ -17,7 +17,18 @@ import {
   AlertTriangle, 
   HelpCircle,
   FileCheck,
-  Calendar
+  Calendar,
+  ShoppingBag,
+  Tag,
+  Home,
+  MessageCircle,
+  Search,
+  Filter,
+  Check,
+  Layers,
+  Percent,
+  MapPin,
+  Building
 } from 'lucide-react';
 import { 
   collection, 
@@ -28,9 +39,10 @@ import {
   onSnapshot 
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
+import AdminDashboard from './AdminDashboard';
 
 interface RoleDashboardsProps {
-  role: 'customer' | 'marketing' | 'manager';
+  role: 'customer' | 'marketing' | 'manager' | 'admin';
   userIdentifier: string;
   onLogout: () => void;
 }
@@ -57,6 +69,13 @@ const INITIAL_DENDA = [
   { id: 301, creditorName: 'Agus Setiawan', phone: '081233445566', marketingName: 'Adi Saputra (ID: M-552)', unit: 'Honda Vario 160', lease: 'FIF Group', potentialDenda: 450000, probPercent: 95, status: 'Keterlambatan 6 Hari' },
   { id: 302, creditorName: 'Siti Rahmawati', phone: '085799887766', marketingName: 'Bambang Sudewo (ID: M-101)', unit: 'Toyota Avanza 2020', lease: 'Adira Finance', potentialDenda: 1200000, probPercent: 88, status: 'Keterlambatan 9 Hari' },
   { id: 303, creditorName: 'Rian Hidayat', phone: '089855443322', marketingName: 'Rina Astuti (ID: M-308)', unit: 'Yamaha Aerox 2022', lease: 'OTO Finance', potentialDenda: 350000, probPercent: 92, status: 'Keterlambatan 4 Hari' }
+];
+
+const INITIAL_MARKETING_PARTNERS = [
+  { id: 'MB-7789', name: 'Andi Pratama', code: 'MB-7789', phone: '081299881122', email: 'andi.pratama@mitrabayar.co.id', status: 'Aktif Partner', region: 'DKI Jakarta', tier: 'Gold Specialist' },
+  { id: 'MB-308', name: 'Rina Astuti', code: 'MB-308', phone: '085799887766', email: 'rina.astuti@mitrabayar.co.id', status: 'Aktif Partner', region: 'Jawa Barat', tier: 'Senior Consultant' },
+  { id: 'MB-101', name: 'Bambang Sudewo', code: 'MB-101', phone: '085711223344', email: 'bambang.s@mitrabayar.co.id', status: 'Aktif Partner', region: 'Jawa Tengah', tier: 'Executive Referral' },
+  { id: 'MB-552', name: 'Adi Saputra', code: 'MB-552', phone: '081233445566', email: 'adi.saputra@mitrabayar.co.id', status: 'Aktif Partner', region: 'Jawa Timur', tier: 'Partner Advisor' },
 ];
 
 export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleDashboardsProps) {
@@ -89,6 +108,112 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
   const [newCustUnit, setNewCustUnit] = useState('');
   const [newCustInstallment, setNewCustInstallment] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('Semua');
+
+  // E-Commerce states
+  const [marketingTab, setMarketingTab] = useState<'summary' | 'ecommerce'>('summary');
+  const [ecommerceAssets, setEcommerceAssets] = useState<any[]>([
+    {
+      id: 'ast-101',
+      category: 'motor',
+      title: 'Akomodasi Likuidasi FIF Group',
+      type: 'Honda ADV 160 ABS 2023',
+      biller: 'FIF Group',
+      creditTag: 'TAG-ECC-8812',
+      liquidationPrice: 18500000,
+      marketPrice: 34000000,
+      condition: 'Mulus 95%, Pajak Jalan, Kunci Lengkap',
+      location: 'Surabaya Timur',
+      status: 'Ready',
+      description: 'Unit tarikan jaminan macet milik debitur FIF. Selisih harga tebus sangat tinggi dibandingkan harga pasaran luar.'
+    },
+    {
+      id: 'ast-102',
+      category: 'motor',
+      title: 'Lelang Tebusan Terbatas Adira',
+      type: 'Yamaha XMAX 250 Connected 2022',
+      biller: 'Adira Finance',
+      creditTag: 'TAG-ECC-1122',
+      liquidationPrice: 35000000,
+      marketPrice: 58000000,
+      condition: 'Kilometer rendah (12rb km), Variasi Ringan',
+      location: 'DKI Jakarta',
+      status: 'Ready',
+      description: 'Aset jaminan diserahkan sukarela oleh debitur terdahulu. Surat dilepas resmi dari kelembagaan.'
+    },
+    {
+      id: 'ast-103',
+      category: 'mobil',
+      title: 'Aset Sitaan Premium BCA Finance',
+      type: 'Toyota Innova Reborn 2.4 V Diesel AT 2019',
+      biller: 'BCA Finance',
+      creditTag: 'TAG-ECC-5544',
+      liquidationPrice: 195000000,
+      marketPrice: 285000000,
+      condition: 'Mesin Kering, Kaki-kaki Sunyi, Interior Orisinil',
+      location: 'Bandung Kota',
+      status: 'Ready',
+      description: 'Transmisi matic responsif. BPKB dalam status release dan siap balik nama langsung.'
+    },
+    {
+      id: 'ast-104',
+      category: 'mobil',
+      title: 'Satya Murah Likuidasi OTO',
+      type: 'Honda Brio Satya 1.2 E CVT 2021',
+      biller: 'OTO Finance',
+      creditTag: 'TAG-ECC-4433',
+      liquidationPrice: 82500000,
+      marketPrice: 135000000,
+      condition: 'Kunci Serep Ada, Warna Putih Favorit, Record Dealer',
+      location: 'Semarang Candi',
+      status: 'Proses',
+      description: 'Sedang peninjauan berkas tebusan bersama penjamin. Siap dipihak-ketigakan kembali.'
+    },
+    {
+      id: 'ast-105',
+      category: 'rumah',
+      title: 'KPR Macet BTN Syariah',
+      type: 'Rumah Hunian Minimalis Modern Type 45/90',
+      biller: 'BTN Syariah',
+      creditTag: 'TAG-ECC-3322',
+      liquidationPrice: 245000000,
+      marketPrice: 450000000,
+      condition: 'SHM, Listrik 1300W, Air Sumur Bersih, 2 KT 1 KM',
+      location: 'Malang Dinoyo',
+      status: 'Ready',
+      description: 'Kawasan bebas banjir, siap huni. Likuidasi cepat akibat gagal angsuran akhir tahun ke-3.'
+    },
+    {
+      id: 'ast-106',
+      category: 'rumah',
+      title: 'Ruko Usaha Mandiri Macet',
+      type: 'Ruko Niaga Strategis 2 Lantai',
+      biller: 'Bank Mandiri',
+      creditTag: 'TAG-ECC-9900',
+      liquidationPrice: 450000000,
+      marketPrice: 850000000,
+      condition: 'SHGB, Parkiran Luas, Pinggir Jalan Utama Raya',
+      location: 'Sidoarjo',
+      status: 'Ready',
+      description: 'Sangat cocok untuk kantor, toko, atau minimarket. Harga jual cepat di bawah NJOP.'
+    }
+  ]);
+  const [ecCategoryFilter, setEcCategoryFilter] = useState<string>('semua');
+  const [ecSearch, setEcSearch] = useState<string>('');
+  const [showAddAssetForm, setShowAddAssetForm] = useState<boolean>(false);
+  const [newAssetCategory, setNewAssetCategory] = useState<'motor' | 'mobil' | 'rumah'>('motor');
+  const [newAssetType, setNewAssetType] = useState<string>('');
+  const [newAssetBiller, setNewAssetBiller] = useState<string>('Adira Finance');
+  const [newAssetTag, setNewAssetTag] = useState<string>('');
+  const [newAssetLiqPrice, setNewAssetLiqPrice] = useState<string>('');
+  const [newAssetMktPrice, setNewAssetMktPrice] = useState<string>('');
+  const [newAssetCondition, setNewAssetCondition] = useState<string>('');
+  const [newAssetLocation, setNewAssetLocation] = useState<string>('');
+  const [newAssetDesc, setNewAssetDesc] = useState<string>('');
+  const [bidValue, setBidValue] = useState<{ [key: string]: string }>({});
+  const [selectedSimulateAsset, setSelectedSimulateAsset] = useState<any | null>(null);
+  const [simulateTenor, setSimulateTenor] = useState<number>(12);
 
   // Manager states
   const [requestQueue, setRequestQueue] = useState<any[]>([]);
@@ -99,6 +224,7 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
   const [managerCommissionsTotal, setManagerCommissionsTotal] = useState(1250000);
   const [managerCommissionsReceived, setManagerCommissionsReceived] = useState<any[]>([]);
   const [potentialDendaList, setPotentialDendaList] = useState<any[]>([]);
+  const [mktSearch, setMktSearch] = useState('');
 
   // 1. Subscribe and sync Customers Collection
   useEffect(() => {
@@ -288,6 +414,18 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
 
   const displayUser = userIdentifier || "User Demo";
 
+  // Filter customers for marketing search and status queries
+  const filteredCustomers = customers.filter(c => {
+    const term = searchQuery.toLowerCase();
+    const matchesSearch = 
+      (c.name || '').toLowerCase().includes(term) || 
+      (c.phone || '').includes(term) ||
+      (c.unit || '').toLowerCase().includes(term) ||
+      (c.lease || '').toLowerCase().includes(term);
+    const matchesStatus = statusFilter === 'Semua' || c.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   // Customer action: request fund
   const handleRequestEmergencyFund = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -347,7 +485,7 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
   const handleAddCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCustName || !newCustPhone || !newCustUnit || !newCustInstallment) {
-      alert('Tolong lengkapi semua kolom pendaftaran!');
+      triggerSuccess('Tolong lengkapi semua kolom pendaftaran!');
       return;
     }
     const formatInstallment = 'Rp ' + parseInt(newCustInstallment.replace(/\D/g, '')).toLocaleString('id-ID');
@@ -422,7 +560,7 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
   };
 
   return (
-    <div className="w-full bg-slate-50 border border-gray-100 rounded-3xl p-4 sm:p-6 md:p-8 shadow-inner select-none font-sans">
+    <div className="w-full bg-gradient-to-br from-white/95 via-[#f0f9ff]/95 to-[#e0f2fe]/75 border border-blue-100/80 rounded-3xl p-4 sm:p-6 md:p-8 shadow-md select-none font-sans backdrop-blur-md">
 
       
       {/* Banner / Header Dashboard */}
@@ -780,10 +918,52 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
       {/* 2. MARKETING DASHBOARD LAYOUT           */}
       {/* ======================================= */}
       {role === 'marketing' && (
-        <div className="space-y-8">
+        <div className="space-y-8 border-t border-slate-100 pt-3">
           
-          {/* Status cards row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Header Panel with Custom Subrouting Tabs */}
+          <div className="bg-white border border-slate-105 rounded-[1.8rem] p-5 shadow-3xs flex flex-col md:flex-row justify-between items-center gap-5 text-left">
+            <div className="flex-1 w-full md:w-auto">
+              <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded font-extrabold text-[11px] uppercase tracking-widest inline-block mb-1">👑 Portal Partner Marketing Finance</span>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Kreditur & E-Commerce Jaminan</h2>
+              <p className="text-xs text-slate-500 font-medium mt-1">Grup Afiliasi ID: <span className="font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">{userIdentifier || 'MB-7789'}</span></p>
+            </div>
+            
+            {/* Elegant Sub-navigation Tabs */}
+            <div className="bg-slate-100/80 p-1 rounded-2xl flex gap-1 w-full md:w-auto border border-slate-205/30 shrink-0">
+              <button
+                onClick={() => setMarketingTab('summary')}
+                className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  marketingTab === 'summary' 
+                    ? 'bg-white text-slate-900 shadow-sm' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Users size={15} />
+                <span>Ringkasan & Debitur</span>
+              </button>
+              
+              <button
+                onClick={() => setMarketingTab('ecommerce')}
+                className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl text-xs font-black transition-all relative cursor-pointer ${
+                  marketingTab === 'ecommerce' 
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/10' 
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <ShoppingBag size={15} />
+                <span>E-Commerce Jual Beli Aset</span>
+                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {marketingTab === 'summary' ? (
+            <div className="space-y-8 animate-fade-in text-left">
+              {/* Status cards row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
                 <Users size={24} />
@@ -842,35 +1022,323 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
             </div>
           </div>
 
+          {/* SEKSI ILUSTRASI KONDISI KREDITUR BINAAN (ID TAGIHAN, PINJAMAN, ANGSURAN, DENDA) */}
+          <div className="bg-white border border-slate-100 rounded-3xl shadow-sm p-6 space-y-6">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-105 pb-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                  <span className="p-1.5 bg-indigo-50 text-indigo-600 rounded-xl"><FileText size={16} /></span>
+                  <span>Ilustrasi Kondisi Finansial Kreditur Binaan</span>
+                </h3>
+                <p className="text-xs text-slate-500 font-semibold mt-0.5">
+                  Visualisasi komprehensif profil tagihan, denda berjalan, tenor, sisa plafon, serta riwayat pendanaan talangan
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="px-2.5 py-1 bg-amber-50 rounded-lg text-[10px] font-black text-amber-700 border border-amber-100">
+                  Total Kelolaan: Rp 81.800.000
+                </span>
+                <span className="px-2.5 py-1 bg-emerald-50 rounded-lg text-[10px] font-black text-emerald-700 border border-emerald-100">
+                  Rasio Aman: 92%
+                </span>
+              </div>
+            </div>
+
+            {/* Bento-style metrics of the portfolio illustration */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
+                <span className="text-[9px] text-indigo-805 block font-black uppercase tracking-wider">Kreditur Rekrutan</span>
+                <span className="text-sm sm:text-base font-sans font-black text-indigo-950 block mt-1">4 Jiwa</span>
+                <span className="text-[9px] text-indigo-600 font-semibold mt-0.5">Aktif binaan langsung Anda</span>
+              </div>
+              <div className="p-3.5 bg-slate-50/85 border border-slate-100 rounded-2xl">
+                <span className="text-[9px] text-slate-400 block font-black uppercase tracking-wider">Total Pinjaman (Plafon)</span>
+                <span className="text-sm sm:text-base font-mono font-black text-slate-800 block mt-1">Rp 81.800.000</span>
+                <span className="text-[9px] text-slate-450 block font-semibold mt-0.5">Akumulasi limit 4 kreditur</span>
+              </div>
+              <div className="p-3.5 bg-slate-50/85 border border-slate-100 rounded-2xl">
+                <span className="text-[9px] text-slate-400 block font-black uppercase tracking-wider">Angsuran Bulanan</span>
+                <span className="text-sm sm:text-base font-mono font-black text-indigo-600 block mt-1">Rp 3.610.000</span>
+                <span className="text-[9px] text-indigo-505 block font-semibold mt-0.5">&Sigma; Kewajiban bulan berjalan</span>
+              </div>
+              <div className="p-3.5 bg-amber-50/40 border border-amber-100/60 rounded-2xl">
+                <span className="text-[9px] text-amber-805 block font-black uppercase tracking-wider">Denda Jatuh Tempo</span>
+                <span className="text-sm sm:text-base font-mono font-black text-red-600 block mt-1">Rp 625.000</span>
+                <span className="text-[9px] text-amber-600 font-semibold mt-0.5">2 Kreditur terlambat denda</span>
+              </div>
+              <div className="p-3.5 bg-emerald-50/30 border border-emerald-100/60 rounded-2xl">
+                <span className="text-[9px] text-emerald-805 block font-black uppercase tracking-wider">Bonus Komisi Estimasi</span>
+                <span className="text-sm sm:text-base font-mono font-black text-emerald-600 block mt-1">Rp 250.005</span>
+                <span className="text-[9px] text-emerald-600 font-semibold mt-0.5">Komisi 40% denda ditalangi</span>
+              </div>
+            </div>
+
+            {/* Simulated Live interactive controller */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+              {/* Card 1: Budi Santoso */}
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between hover:shadow-md transition">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <span className="text-[9px] bg-slate-100 text-slate-500 font-bold px-1.5 py-0.5 rounded-md font-mono">
+                        TAG-9023-BS
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-sm mt-1">Budi Santoso</h4>
+                      <p className="text-[9px] text-slate-400 font-mono">0812-9988-1122</p>
+                    </div>
+                    <span className="px-2 py-0.5 bg-green-50 text-green-700 border border-green-100 rounded-md text-[9px] font-black">
+                      Lancar
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 border-t border-b border-dashed border-slate-100 py-2 text-[11px]">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Pembiayaan:</span>
+                      <span className="font-bold text-slate-700">Adira Finance</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Unit:</span>
+                      <span className="font-semibold text-slate-600 truncate max-w-[110px]">Honda Scoopy 2023</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Jumlah Pinjaman:</span>
+                      <span className="font-bold text-slate-800 font-mono">Rp 18.500.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Nilai Angsuran:</span>
+                      <span className="font-mono text-indigo-650 font-bold">Rp 850.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Denda Berjalan:</span>
+                      <span className="font-mono text-green-600 font-bold">Rp 0</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 flex justify-between items-center text-[10px] text-slate-400 font-semibold">
+                  <span>Tenor: 12 / 24 bln</span>
+                  <span className="text-green-600 font-extrabold flex items-center gap-0.5">
+                    <CheckCircle size={10} /> Terlindungi
+                  </span>
+                </div>
+              </div>
+
+              {/* Card 2: Siti Aminah */}
+              <div className="bg-white border-2 border-amber-200 rounded-2xl p-4 flex flex-col justify-between hover:shadow-md transition">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <span className="text-[9px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded-md font-mono">
+                        TAG-4411-SA
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-sm mt-1">Siti Aminah</h4>
+                      <p className="text-[9px] text-slate-400 font-mono">0857-1122-3344</p>
+                    </div>
+                    <span className="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-md text-[9px] font-black animate-pulse">
+                      Terlambat 4 Hari
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 border-t border-b border-dashed border-slate-100 py-2 text-[11px]">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Pembiayaan:</span>
+                      <span className="font-bold text-slate-700">FIF Group</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Unit:</span>
+                      <span className="font-semibold text-slate-600 truncate max-w-[110px]">Suzuki NEX II 2022</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Jumlah Pinjaman:</span>
+                      <span className="font-bold text-slate-800 font-mono">Rp 14.200.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Nilai Angsuran:</span>
+                      <span className="font-mono text-indigo-650 font-bold">Rp 720.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Denda Berjalan:</span>
+                      <span className="font-mono text-red-650 font-extrabold bg-red-50 px-1 rounded">Rp 145.000</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 space-y-2">
+                  <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold mb-1">
+                    <span>Tenor: 6 / 18 Bln</span>
+                    <span className="text-amber-600 font-bold">Dana Sementara</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      triggerSuccess('Sukses simulasi! Dana Talangan Rp 145.000 disalurkan ke FIF Group. Sisa Denda Siti Aminah terbayar Rp 0. Komisi marketing 40% (Rp 58.000 / Rp 145.000 denda) dialokasikan.');
+                    }}
+                    className="w-full py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-lg text-[10px] shadow-2xs hover:from-amber-600 active:scale-95 transition cursor-pointer"
+                  >
+                    Simulasikan Talangan
+                  </button>
+                </div>
+              </div>
+
+              {/* Card 3: Farhan Azis */}
+              <div className="bg-white border-2 border-red-200 rounded-2xl p-4 flex flex-col justify-between hover:shadow-md transition">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <span className="text-[9px] bg-red-50 text-red-700 font-bold px-1.5 py-0.5 rounded-md font-mono">
+                        TAG-1155-FA
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-sm mt-1">Farhan Azis</h4>
+                      <p className="text-[9px] text-slate-400 font-mono">0899-0011-2233</p>
+                    </div>
+                    <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-100 rounded-md text-[9px] font-black animate-bounce">
+                      Terlambat 8 Hari
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 border-t border-b border-dashed border-slate-100 py-2 text-[11px]">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Pembiayaan:</span>
+                      <span className="font-bold text-slate-700">Adira Finance</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Unit:</span>
+                      <span className="font-semibold text-slate-600 truncate max-w-[110px]">Yamaha NMAX 2022</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Jumlah Pinjaman:</span>
+                      <span className="font-bold text-slate-800 font-mono">Rp 32.000.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Nilai Angsuran:</span>
+                      <span className="font-mono text-indigo-650 font-bold">Rp 1.250.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Denda Berjalan:</span>
+                      <span className="font-mono text-red-700 font-black bg-red-100 px-1 rounded animate-pulse">Rp 480.000</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 space-y-2">
+                  <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold mb-1">
+                    <span>Tenor: 24 / 36 Bln</span>
+                    <span className="text-red-700 font-bold font-sans">Risiko Sita</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      triggerSuccess('Sukses simulasi! Dana Talangan Rp 480.000 disalurkan ke Adira Finance. Denda Farhan Azis disembuhkan. Komisi marketing 40% (Rp 192.000) dialokasikan.');
+                    }}
+                    className="w-full py-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-lg text-[10px] shadow-2xs hover:from-red-655 active:scale-95 transition cursor-pointer"
+                  >
+                    Darurat Talangi Denda
+                  </button>
+                </div>
+              </div>
+
+              {/* Card 4: Hendra Wijaya */}
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col justify-between hover:shadow-md transition">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start gap-2">
+                    <div>
+                      <span className="text-[9px] bg-slate-100 text-slate-500 font-bold px-1.5 py-0.5 rounded-md font-mono">
+                        TAG-7819-HW
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-sm mt-1">Hendra Wijaya</h4>
+                      <p className="text-[9px] text-slate-400 font-mono">0852-9988-7755</p>
+                    </div>
+                    <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-md text-[9px] font-black">
+                      Baru Registrasi
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 border-t border-b border-dashed border-slate-100 py-2 text-[11px]">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Pembiayaan:</span>
+                      <span className="font-bold text-slate-700">OTO Finance</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Unit:</span>
+                      <span className="font-semibold text-slate-600 truncate max-w-[110px]">Honda Beat Sporty</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Jumlah Pinjaman:</span>
+                      <span className="font-bold text-slate-800 font-mono">Rp 17.100.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Nilai Angsuran:</span>
+                      <span className="font-mono text-indigo-650 font-bold">Rp 790.000</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Denda Berjalan:</span>
+                      <span className="font-mono text-green-600 font-bold">Rp 0</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 flex justify-between items-center text-[10px] text-slate-400 font-semibold">
+                  <span>Tenor: 35 / 36 bln</span>
+                  <span className="text-indigo-650 font-extrabold flex items-center gap-0.5">
+                    <Sparkles size={10} /> Garansi Aktif
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-white border border-gray-200 rounded-3xl p-5 sm:p-6 shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
               <div>
                 <h3 className="font-extrabold text-slate-800 text-lg flex items-center gap-2">
                   <Users size={20} className="text-emerald-600" />
-                  <span>Daftar Debitur dalam Jaringan Afiliasi Anda</span>
+                  <span>Daftar & Manajemen Data Kreditur</span>
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">Daftar pelanggan yang terdaftar memakai kode referral Mitra ID Anda</p>
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">Data kreditur (pelanggan/debitur) yang terdaftar memakai kode referral Mitra ID Anda</p>
               </div>
               <button
                 onClick={() => setShowAddForm(!showAddForm)}
                 className="flex items-center gap-1.5 px-4  py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-transform active:scale-95 cursor-pointer self-start sm:self-auto shadow-md"
               >
                 <Plus size={16} />
-                <span>Daftarkan Debitur Baru</span>
+                <span>Daftarkan Kreditur Baru</span>
               </button>
+            </div>
+
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6 bg-slate-50/75 p-4 rounded-2xl border border-slate-100">
+              <div className="flex-1 relative">
+                <input 
+                  type="text" 
+                  placeholder="Cari nama kreditur, no handphone, leasing, atau unit..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="sm:w-48">
+                <select 
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                >
+                  <option value="Semua">Semua Status</option>
+                  <option value="Aktif Terlindungi">Aktif Terlindungi</option>
+                  <option value="Terlambat - Bayar Sementara">Terlambat - Bayar Sementara</option>
+                  <option value="Menunggu Verifikasi">Menunggu Verifikasi</option>
+                </select>
+              </div>
             </div>
 
             {/* Add customer slide/form */}
             {showAddForm && (
               <div className="mb-8 p-6 bg-emerald-50/70 border border-emerald-100 rounded-2xl animate-fade-in space-y-4">
                 <div className="flex justify-between items-center border-b border-emerald-200/50 pb-2.5">
-                  <span className="font-black text-sm text-emerald-800 block">Formulir Registrasi Debitur Baru</span>
+                  <span className="font-black text-sm text-emerald-800 block">Formulir Registrasi Kreditur Baru</span>
                   <X size={18} className="text-emerald-500 cursor-pointer" onClick={() => setShowAddForm(false)} />
                 </div>
                 
                 <form onSubmit={handleAddCustomer} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Nama Lengkap Debitur</label>
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Nama Lengkap Kreditur</label>
                     <input 
                       type="text" 
                       required 
@@ -935,64 +1403,611 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
                       type="submit"
                       className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-xl transition-all"
                     >
-                      Tambahkan Pelanggan Secara Instan
+                      Tambahkan Kreditur Secara Instan
                     </button>
                   </div>
                 </form>
               </div>
             )}
 
-            {/* Table layout responsive */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200 text-slate-400 font-bold uppercase tracking-wider">
-                    <th className="py-3 px-4 font-bold text-slate-500">Nama Debitur</th>
-                    <th className="py-3 px-4 font-bold text-slate-500">No HP</th>
-                    <th className="py-3 px-4 font-bold text-slate-500">Leasing / Unit</th>
-                    <th className="py-3 px-4 font-bold text-slate-500">Angsuran</th>
-                    <th className="py-3 px-4 font-bold text-slate-500">Status Proteksi denda</th>
-                    <th className="py-3 px-4 font-bold text-slate-500 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 font-medium">
-                  {customers.map((c) => (
-                    <tr key={c.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-4.5 px-4 font-bold text-slate-900">{c.name}</td>
-                      <td className="py-4.5 px-4 text-slate-600">{c.phone}</td>
-                      <td className="py-4.5 px-4 text-slate-700">
-                        <span className="font-bold text-slate-800 block">{c.lease}</span>
-                        <span className="text-xs text-slate-500">{c.unit}</span>
-                      </td>
-                      <td className="py-4.5 px-4 font-bold text-slate-850">{c.installment}</td>
-                      <td className="py-4.5 px-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                          c.status === 'Aktif Terlindungi' ? 'bg-green-100 text-green-700' :
-                          c.status === 'Terlambat - Bayar Sementara' ? 'bg-amber-100 text-amber-700 animate-pulse' :
-                          'bg-blue-100 text-blue-700'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'Aktif Terlindungi' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
-                          {c.status}
-                        </span>
-                      </td>
-                      <td className="py-4.5 px-4 text-right">
-                        <button
-                          onClick={() => handleDeleteCustomer(c.id)}
-                          className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
+            {filteredCustomers.length === 0 ? (
+              <div className="text-center py-10 px-4 bg-slate-55/40 rounded-2xl border border-slate-100 text-slate-500 font-medium">
+                <p className="text-sm">Data Kreditur tidak ditemukan</p>
+                <p className="text-xs text-slate-400 font-normal mt-1">Coba sesuaikan kata kunci pencarian atau filter status Anda.</p>
+              </div>
+            ) : (
+              /* Table layout responsive */
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-slate-400 font-bold uppercase tracking-wider">
+                      <th className="py-3 px-4 font-bold text-slate-500">Nama Kreditur</th>
+                      <th className="py-3 px-4 font-bold text-slate-500">No HP</th>
+                      <th className="py-3 px-4 font-bold text-slate-500">Kreditur Leasing / Unit Aset</th>
+                      <th className="py-3 px-4 font-bold text-slate-500">Angsuran Bulanan</th>
+                      <th className="py-3 px-4 font-bold text-slate-500">Status Proteksi Denda</th>
+                      <th className="py-3 px-4 font-bold text-slate-500 text-right">Aksi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 font-medium">
+                    {filteredCustomers.map((c) => (
+                      <tr key={c.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-4.5 px-4 font-bold text-slate-900">{c.name}</td>
+                        <td className="py-4.5 px-4 text-slate-600">{c.phone}</td>
+                        <td className="py-4.5 px-4 text-slate-700">
+                          <span className="font-bold text-slate-800 block">{c.lease}</span>
+                          <span className="text-xs text-slate-500">{c.unit}</span>
+                        </td>
+                        <td className="py-4.5 px-4 font-bold text-slate-850">{c.installment}</td>
+                        <td className="py-4.5 px-4">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                            c.status === 'Aktif Terlindungi' ? 'bg-green-100 text-green-700' :
+                            c.status === 'Terlambat - Bayar Sementara' ? 'bg-amber-100 text-amber-700 animate-pulse' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'Aktif Terlindungi' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
+                            {c.status}
+                          </span>
+                        </td>
+                        <td className="py-4.5 px-4 text-right">
+                          <button
+                            onClick={() => handleDeleteCustomer(c.id)}
+                            className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center justify-center cursor-pointer"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
         </div>
+      ) : (
+        /* ==================================================== */
+        /* E-COMMERCE PORTAL: JUAL BELI ASET JAMINAN PEMBIAYAAN */
+        /* ==================================================== */
+        <div className="space-y-8 animate-fade-in text-left">
+          
+          {/* Banner Hero */}
+          <div className="bg-gradient-to-r from-emerald-600 via-emerald-750 to-teal-800 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-md">
+            <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-x-12 translate-y-12">
+              <ShoppingBag size={300} />
+            </div>
+            <div className="relative z-10 max-w-2xl">
+              <span className="px-3 py-1 bg-white/20 text-white rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">
+                💰 Pasar Likuidasi Jaminan Macet
+              </span>
+              <h3 className="text-xl sm:text-3xl font-black text-white mt-3 leading-tight">
+                Sentra Tebus Aset Jaminan Pembiayaan (Over-Kredit)
+              </h3>
+              <p className="text-xs sm:text-sm text-emerald-105 mt-2 leading-relaxed font-medium">
+                Platform e-commerce eksklusif penyelesaian aset jaminan nasabah binaan yang mengalami gagal bayar. Dapatkan aset Motor, Mobil, & Rumah berkualitas dengan diskonto tinggi (30% - 50% di bawah harga pasar) legal, aman, langsung dari lembaga pembiayaan mitra tebus.
+              </p>
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-2 text-emerald-600 mb-1">
+                <Layers size={16} />
+                <span className="text-[10px] text-slate-450 font-extrabold uppercase tracking-wider block">Total Aset Listing</span>
+              </div>
+              <span className="text-xl font-black text-slate-800 font-mono">{ecommerceAssets.length} Unit</span>
+              <span className="text-[9px] text-slate-500 font-semibold block mt-0.5">Motor, Mobil, & Properti</span>
+            </div>
+            <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-2 text-indigo-600 mb-1">
+                <Percent size={16} />
+                <span className="text-[10px] text-slate-450 font-extrabold uppercase tracking-wider block">Rata-rata Diskonto</span>
+              </div>
+              <span className="text-xl font-black text-indigo-600 font-mono">35% - 48%</span>
+              <span className="text-[9px] text-indigo-500 block font-semibold mt-0.5">Di bawah harga pasar umum</span>
+            </div>
+            <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-2 text-amber-600 mb-1">
+                <Check size={16} />
+                <span className="text-[10px] text-slate-450 font-extrabold uppercase tracking-wider block">Keabsahan Legalitas</span>
+              </div>
+              <span className="text-xl font-black text-amber-600">100% Valid</span>
+              <span className="text-[9px] text-slate-500 font-semibold block mt-0.5">Berita acara pelepasan resmi</span>
+            </div>
+            <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-2 text-rose-600 mb-1">
+                <Tag size={16} />
+                <span className="text-[10px] text-slate-455 font-extrabold uppercase tracking-wider block font-sans">Sistem Tebus</span>
+              </div>
+              <span className="text-xl font-black text-rose-600">Over Kredit</span>
+              <span className="text-[9px] text-slate-500 font-semibold block mt-0.5">Sisa tenor & angsuran fleksi</span>
+            </div>
+          </div>
+
+          {/* Controls: Search, Category Filter, and Add asset button */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
+            {/* Category tabs */}
+            <div className="flex flex-wrap gap-1.5 p-1 bg-slate-100 rounded-xl max-w-fit border border-slate-200/50 text-xs font-bold text-slate-600">
+              {['semua', 'motor', 'mobil', 'rumah'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setEcCategoryFilter(cat)}
+                  className={`px-4 py-1.5 rounded-lg font-black transition capitalize cursor-pointer ${
+                    ecCategoryFilter === cat
+                      ? 'bg-white text-slate-900 shadow-3xs'
+                      : 'hover:text-slate-900'
+                  }`}
+                >
+                  {cat === 'semua' ? 'Semua Kategori' : cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Search Input & Action Button */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center flex-1 md:justify-end">
+              <div className="relative flex-1 max-w-md">
+                <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Cari tipe kendaraan, nama asisten, denda, atau lokasi..."
+                  value={ecSearch}
+                  onChange={(e) => setEcSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800"
+                />
+              </div>
+
+              <button
+                onClick={() => setShowAddAssetForm(!showAddAssetForm)}
+                className="flex items-center justify-center gap-1.5 px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition cursor-pointer shadow-md"
+              >
+                <Plus size={15} />
+                <span>Upload Aset Likuidasi</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Form Create New Asset */}
+          {showAddAssetForm && (
+            <div className="bg-emerald-50/60 border border-emerald-100 rounded-3xl p-6 shadow-3xs space-y-4 animate-fade-in text-left">
+              <div className="flex justify-between items-center border-b border-emerald-200/40 pb-2.5">
+                <div>
+                  <h4 className="font-black text-sm text-emerald-800">Tambahkan Aset Lelang / Likuidasi Jaminan</h4>
+                  <p className="text-[11px] text-emerald-600/80 font-semibold mt-0.5">Asosiasikan aset sitaan milik nasabah gagal bayar untuk ditawarkan tebus ke investor atau publik</p>
+                </div>
+                <button 
+                  onClick={() => setShowAddAssetForm(false)} 
+                  className="p-1 text-emerald-500 hover:text-emerald-700 rounded-full hover:bg-emerald-100/50 cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (!newAssetType || !newAssetLiqPrice) {
+                  triggerSuccess('Isi data wajib terlebih dahulu!');
+                  return;
+                }
+                const newAsset = {
+                  id: `ast-${Date.now()}`,
+                  category: newAssetCategory,
+                  title: `Peletakan Hak Tagih ${newAssetBiller}`,
+                  type: newAssetType,
+                  biller: newAssetBiller,
+                  creditTag: newAssetTag || `TAG-ECC-${Math.floor(1000 + Math.random() * 9000)}`,
+                  liquidationPrice: Number(newAssetLiqPrice),
+                  marketPrice: Number(newAssetMktPrice) || Number(newAssetLiqPrice) * 1.5,
+                  condition: newAssetCondition || 'Kondisi Sesuai Standar Unit Tarikan Jaminan',
+                  location: newAssetLocation || 'Gudang Pusat',
+                  status: 'Ready',
+                  description: newAssetDesc || 'Unit dalam proses penyerahan sukarela secara mufakat oleh nasabah dan siap dinalangi atau dilelang tebus.'
+                };
+                setEcommerceAssets([newAsset, ...ecommerceAssets]);
+                // Reset form
+                setNewAssetType('');
+                setNewAssetTag('');
+                setNewAssetLiqPrice('');
+                setNewAssetMktPrice('');
+                setNewAssetCondition('');
+                setNewAssetLocation('');
+                setNewAssetDesc('');
+                setShowAddAssetForm(false);
+                triggerSuccess(`Sukses! Aset Jaminan ${newAssetType} resmi terdaftar di e-commerce likuidasi.`);
+              }} className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-semibold">
+                <div>
+                  <label className="block text-slate-705 mb-1 font-bold">Kategori Aset</label>
+                  <select
+                    value={newAssetCategory}
+                    onChange={(e: any) => setNewAssetCategory(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs font-bold focus:ring-1 focus:ring-emerald-500"
+                  >
+                    <option value="motor">🏍️ Sepeda Motor</option>
+                    <option value="mobil">🚗 Mobil</option>
+                    <option value="rumah">🏠 Rumah & Ruko</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-705 mb-1 font-bold">Lembaga Pembiayaan (Biller)</label>
+                  <select
+                    value={newAssetBiller}
+                    onChange={(e) => setNewAssetBiller(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs font-bold"
+                  >
+                    <option value="Adira Finance">Adira Finance</option>
+                    <option value="FIF Group">FIF Group</option>
+                    <option value="BCA Finance">BCA Finance</option>
+                    <option value="OTO Finance">OTO Finance</option>
+                    <option value="BTN Syariah">BTN Syariah</option>
+                    <option value="Bank Mandiri">Bank Mandiri</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-705 mb-1 font-bold">ID Kreditur Jaminan / No Tagihan</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: TAG-9932-SA"
+                    value={newAssetTag}
+                    onChange={(e) => setNewAssetTag(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-slate-705 mb-1 font-bold">Nama Model / Detail Aset</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Toyota Fortuner VRZ Diesel AT 2021 atau Ruko Dinoyo Type 3"
+                    value={newAssetType}
+                    onChange={(e) => setNewAssetType(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-705 mb-1 font-bold">Lokasi Aset Sekarang</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Malang, Surabaya Timur, Jakarta Selatan"
+                    value={newAssetLocation}
+                    onChange={(e) => setNewAssetLocation(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-705 mb-1 font-bold">Harga Tebus / Nilai Tagihan Macet (Rp)</label>
+                  <input
+                    type="number"
+                    required
+                    placeholder="Contoh: 15500000"
+                    value={newAssetLiqPrice}
+                    onChange={(e) => setNewAssetLiqPrice(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs font-bold text-slate-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-705 mb-1 font-bold">Estimasi Harga Pasar Wajar (Rp)</label>
+                  <input
+                    type="number"
+                    placeholder="Contoh: 28000000"
+                    value={newAssetMktPrice}
+                    onChange={(e) => setNewAssetMktPrice(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs font-bold text-slate-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-705 mb-1 font-bold">Keadaan Fisik & Kelengkapan</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Pajak Hidup, Cat Ori, Kunci Serep Ada"
+                    value={newAssetCondition}
+                    onChange={(e) => setNewAssetCondition(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs"
+                  />
+                </div>
+
+                <div className="md:col-span-3">
+                  <label className="block text-slate-705 mb-1 font-bold">Deskripsi Tambahan / Alasan Likuidasi</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Tuliskan latar belakang aset ini jatuh tempo atau keistimewaan unit tebus ini..."
+                    value={newAssetDesc}
+                    onChange={(e) => setNewAssetDesc(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs font-medium"
+                  />
+                </div>
+
+                <div className="md:col-span-3 pt-1">
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-sm transition"
+                  >
+                    Simpan dan Umumkan Aset Likuidasi
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Interactive Calculator Overlay/Modal context */}
+          {selectedSimulateAsset && (
+            <div className="bg-indigo-950 text-white border border-indigo-900 rounded-3xl p-5 sm:p-6 shadow-md space-y-4 animate-fade-in relative text-left">
+              <button 
+                onClick={() => setSelectedSimulateAsset(null)}
+                className="absolute top-4 right-4 text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-full"
+              >
+                <X size={15} />
+              </button>
+              
+              <div className="flex items-center gap-1.5">
+                <span className="p-1.5 bg-white/10 rounded-lg text-indigo-300"><Percent size={14} /></span>
+                <div>
+                  <h4 className="font-extrabold text-sm sm:text-base">Kalkulator Simulasi Kredit / Tebus Aset Jaminan</h4>
+                  <p className="text-[10px] text-indigo-300">Menghitung besaran cicilan fleksibel dengan diskon sisa angsuran</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                {/* Asset summary */}
+                <div className="space-y-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+                  <span className="font-bold text-xs text-indigo-300 block uppercase tracking-wider">Aset Terpilih</span>
+                  <div>
+                    <h5 className="font-black text-sm text-white">{selectedSimulateAsset.type}</h5>
+                    <p className="text-[10px] text-slate-400 capitalize">{selectedSimulateAsset.category} | {selectedSimulateAsset.biller}</p>
+                  </div>
+                  <div className="space-y-1.5 text-[11px] border-t border-dashed border-white/15 pt-2">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Tebusan Pokok:</span>
+                      <span className="font-bold text-emerald-400 font-mono">Rp {selectedSimulateAsset.liquidationPrice.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-450">Harga Wajar:</span>
+                      <span className="font-bold text-slate-300 font-mono">Rp {selectedSimulateAsset.marketPrice.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div className="flex justify-between text-yellow-400 font-bold border-t border-white/5 pt-1.5">
+                      <span>Rentang Hemat:</span>
+                      <span className="font-mono">Rp {(selectedSimulateAsset.marketPrice - selectedSimulateAsset.liquidationPrice).toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Simulation controls */}
+                <div className="space-y-3 text-xs font-semibold md:col-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-300 mb-1.5 font-bold">Uang Muka / DP Minimal 15% (Rp)</label>
+                      <input
+                        type="number"
+                        disabled
+                        value={Math.round(selectedSimulateAsset.liquidationPrice * 0.15)}
+                        id="form-dp-input"
+                        className="w-full px-3 py-2 bg-white/5 border border-white/15 rounded-xl text-white font-bold opacity-80"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 mb-1.5 font-bold">Pilih Tenor Baru (Bulan)</label>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {[12, 24, 36, 48].map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setSimulateTenor(t)}
+                            className={`py-2 rounded-lg font-black transition cursor-pointer text-[11px] ${
+                              simulateTenor === t
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                            }`}
+                          >
+                            {t} Bln
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-indigo-900/60 border border-indigo-800 rounded-xl flex justify-between items-center text-xs mt-3">
+                    <div>
+                      <span className="text-[10px] text-indigo-305 font-bold uppercase block tracking-wider">Estimasi Angsuran Baru</span>
+                      <span className="text-base font-black text-emerald-400 font-mono">
+                        Rp {Math.round(
+                          ((selectedSimulateAsset.liquidationPrice - (selectedSimulateAsset.liquidationPrice * 0.15)) * (1 + (0.08 * (simulateTenor / 12)))) / simulateTenor
+                        ).toLocaleString('id-ID')} <span className="text-[10px] text-white">/ bln</span>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerSuccess(`Sukses! Pengajuan Over-Kredit untuk ${selectedSimulateAsset.type} berhasil diajukan ke ${selectedSimulateAsset.biller} melalui koordinasi Marketing. Petugas akan menghubungi Anda.`);
+                        setSelectedSimulateAsset(null);
+                      }}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black text-[11px] transition"
+                    >
+                      Ajukan Over-Kredit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Asset List Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ecommerceAssets
+              .filter(ast => {
+                if (ecCategoryFilter !== 'semua' && ast.category !== ecCategoryFilter) return false;
+                if (ecSearch) {
+                  const s = ecSearch.toLowerCase();
+                  return (
+                    ast.type.toLowerCase().includes(s) ||
+                    ast.biller.toLowerCase().includes(s) ||
+                    ast.location.toLowerCase().includes(s) ||
+                    ast.creditTag.toLowerCase().includes(s)
+                  );
+                }
+                return true;
+              })
+              .map((ast) => {
+                const discountPercent = Math.round(((ast.marketPrice - ast.liquidationPrice) / ast.marketPrice) * 100);
+
+                return (
+                  <div key={ast.id} className="bg-white border border-slate-205 rounded-3xl p-5 flex flex-col justify-between hover:shadow-md transition duration-200 group relative text-left">
+                    
+                    {/* Corner badge discount */}
+                    <div className="absolute top-4 right-4 bg-rose-50 text-rose-600 border border-rose-100 rounded-full py-1 px-2.5 font-black text-[10px] tracking-wider uppercase flex items-center gap-0.5 shadow-2xs">
+                      <Percent size={10} />
+                      <span>Hemat {discountPercent}%</span>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Top info and category */}
+                      <div className="flex items-center gap-2">
+                        {ast.category === 'motor' && (
+                          <span className="p-2 bg-indigo-50 text-indigo-600 rounded-xl text-lg">🏍️</span>
+                        )}
+                        {ast.category === 'mobil' && (
+                          <span className="p-2 bg-amber-50 text-amber-600 rounded-xl text-lg">🚗</span>
+                        )}
+                        {ast.category === 'rumah' && (
+                          <span className="p-2 bg-teal-50 text-teal-600 rounded-xl text-lg">🏠</span>
+                        )}
+                        <div>
+                          <span className="text-[9px] bg-slate-100 text-slate-500 font-extrabold px-1.5 py-0.5 rounded-md font-mono tracking-wide uppercase">
+                            {ast.creditTag}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-semibold block mt-0.5 capitalize">{ast.category} • {ast.location}</span>
+                        </div>
+                      </div>
+
+                      {/* Header and Title */}
+                      <div>
+                        <span className="text-[10px] font-black text-[#0d2e5c] uppercase block tracking-wider bg-slate-50 p-1.5 rounded-lg border border-slate-105 mb-1.5">
+                          💼 Jaminan Asal: {ast.biller}
+                        </span>
+                        <h4 className="font-extrabold text-slate-800 text-base leading-snug group-hover:text-emerald-700 transition">
+                          {ast.type}
+                        </h4>
+                        <p className="text-xs text-slate-500 font-medium leading-relaxed mt-1.5 line-clamp-3">
+                          {ast.description}
+                        </p>
+                      </div>
+
+                      {/* Info & Specs list */}
+                      <div className="space-y-2 border-t border-b border-dashed border-slate-100 py-3.5 text-xs font-semibold">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Keadaan Fisik:</span>
+                          <span className="text-slate-700 text-right truncate max-w-[170px]">{ast.condition}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-400">Harga Jual / Tebus:</span>
+                          <span className="font-mono text-emerald-600 font-black text-sm">
+                            Rp {ast.liquidationPrice.toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-[11px]">
+                          <span className="text-slate-400">Harga Pasar Wajar:</span>
+                          <span className="font-mono text-slate-400 line-through">
+                            Rp {ast.marketPrice.toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-[11px] bg-emerald-50/50 p-1.5 rounded-lg">
+                          <span className="text-emerald-700 font-extrabold flex items-center gap-0.5"><Sparkles size={11} /> Selisih Hemat</span>
+                          <span className="font-mono text-emerald-800 font-extrabold">
+                            Rp {(ast.marketPrice - ast.liquidationPrice).toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions and Bidding */}
+                    <div className="pt-4 space-y-3">
+                      
+                      {/* Mini Bidding Box */}
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <span className="absolute inset-y-0 left-0 pl-2 flex items-center text-slate-400 text-[10px] font-bold">Rp</span>
+                          <input
+                            type="number"
+                            id={`bid-price-${ast.id}`}
+                            placeholder="Tawar harga..."
+                            className="w-full pl-6 pr-2 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-800"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            const bidInput = document.getElementById(`bid-price-${ast.id}`) as HTMLInputElement;
+                            const bidVal = bidInput ? bidInput.value : '';
+                            if (!bidVal) {
+                              triggerSuccess('Silakan isi nominal penawaran harga Anda.');
+                              return;
+                            }
+                            triggerSuccess(`Sukses mengajukan penawaran (Bid) sebesar Rp ${Number(bidVal).toLocaleString('id-ID')} untuk unit ${ast.type}. Tim marketing akan memverifikasi kesanggupan.`);
+                            if (bidInput) bidInput.value = '';
+                          }}
+                          className="px-3.5 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 hover:bg-indigo-100 font-extrabold text-[11px] rounded-xl transition cursor-pointer"
+                        >
+                          Tawar
+                        </button>
+                      </div>
+
+                      {/* Main Action buttons */}
+                      <div className="grid grid-cols-2 gap-2 text-[11px]">
+                        <button
+                          onClick={() => {
+                            setSelectedSimulateAsset(ast);
+                          }}
+                          className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl transition cursor-pointer text-center"
+                        >
+                          ⚙️ Simulasi Over-Kredit
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            triggerSuccess(`Permintaan tebus langsung senilai Rp ${ast.liquidationPrice.toLocaleString('id-ID')} untuk aset ${ast.type} berhasil dikirimkan ke pihak ${ast.biller}. Berita Acara Tebus (BAT) diterbitkan.`);
+                          }}
+                          className="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-2xs hover:shadow-md transition cursor-pointer text-center"
+                        >
+                          🤝 Tebus Langsung Cash
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                );
+              })}
+          </div>
+
+          {/* Empty indicator */}
+          {ecommerceAssets.filter(ast => {
+            if (ecCategoryFilter !== 'semua' && ast.category !== ecCategoryFilter) return false;
+            if (ecSearch) {
+              const s = ecSearch.toLowerCase();
+              return (
+                ast.type.toLowerCase().includes(s) ||
+                ast.biller.toLowerCase().includes(s) ||
+                ast.location.toLowerCase().includes(s) ||
+                ast.creditTag.toLowerCase().includes(s)
+              );
+            }
+            return true;
+          }).length === 0 && (
+            <div className="text-center py-12 px-4 bg-slate-50 border border-slate-100 rounded-3xl text-slate-500 font-medium w-full">
+              <ShoppingBag size={32} className="mx-auto text-slate-300 mb-2" />
+              <p className="text-sm">Belum ada aset jaminan likuidasi dalam kategori filter ini</p>
+              <p className="text-xs text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian atau ganti filter kategori.</p>
+            </div>
+          )}
+
+        </div>
       )}
+    </div>
+  )}
 
       {/* ======================================= */}
       {/* 3. MANAGER DASHBOARD LAYOUT             */}
@@ -1238,7 +2253,136 @@ export default function RoleDashboards({ role, userIdentifier, onLogout }: RoleD
             )}
           </div>
 
+          {/* ======================================= */}
+          {/* NEW SECTION: DATA MARKETING FINANCE & TURUNAN KREDITUR */}
+          {/* ======================================= */}
+          <div className="bg-white border border-gray-200 rounded-3xl p-5 sm:p-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h3 className="font-extrabold text-slate-800 text-lg flex items-center gap-2">
+                  <Briefcase size={22} className="text-indigo-600" />
+                  <span>Data Marketing Finance & Jaringan Kreditur</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">Pantau kinerja mitra marketing finance dan data seluruh kreditur (debitur) binaan mereka</p>
+              </div>
+              <div className="w-full sm:w-72">
+                <input 
+                  type="text" 
+                  placeholder="Cari nama marketing, kode, atau kota..." 
+                  value={mktSearch}
+                  onChange={(e) => setMktSearch(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* Jaringan Marketing Grid */}
+            <div className="space-y-6">
+              {INITIAL_MARKETING_PARTNERS.filter(p => {
+                const term = mktSearch.toLowerCase();
+                return p.name.toLowerCase().includes(term) || p.code.toLowerCase().includes(term) || p.region.toLowerCase().includes(term);
+              }).map(partner => {
+                const partnerKreditur = customers.filter(c => 
+                  String(c.marketingId || '').toLowerCase() === partner.code.toLowerCase() || 
+                  String(c.marketingId || '').toLowerCase() === partner.id.toLowerCase() ||
+                  (partner.code === 'MB-7789' && (!c.marketingId || c.marketingId === 'Mitra Bayar Demo' || c.marketingId === 'MB-7789'))
+                );
+
+                const activeCount = partnerKreditur.filter(c => c.status === 'Aktif Terlindungi').length;
+
+                return (
+                  <div key={partner.id} className="border border-slate-200/80 rounded-2xl p-5 bg-slate-50/45 hover:bg-slate-50/70 transition-all shadow-xs space-y-4">
+                    {/* Partner Info Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-dashed border-slate-200 pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700 font-bold border border-indigo-100 shrink-0">
+                          {partner.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-extrabold text-sm text-slate-850">{partner.name}</span>
+                            <span className="text-[10px] px-2 py-0.5 bg-indigo-100 text-indigo-700 font-extrabold rounded-md">ID: {partner.code}</span>
+                            <span className="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-850 font-extrabold rounded-md">{partner.tier}</span>
+                          </div>
+                          <div className="flex items-center gap-x-4 gap-y-0.5 flex-wrap text-slate-500 text-[11px] font-medium mt-0.5">
+                            <span>📱 {partner.phone}</span>
+                            <span>📧 {partner.email}</span>
+                            <span>📍 Wilayah: {partner.region}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Partner Stats Row */}
+                      <div className="flex items-center gap-3 text-center md:text-right shrink-0">
+                        <div className="px-3.5 py-2 bg-white border border-slate-200 rounded-xl shadow-xs">
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Kreditur Binaan</span>
+                          <span className="text-xs font-black text-slate-850">{partnerKreditur.length} Orang</span>
+                        </div>
+                        <div className="px-3.5 py-2 bg-white border border-slate-200 rounded-xl shadow-xs">
+                          <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Sehat Proteksi</span>
+                          <span className="text-xs font-black text-emerald-600">{activeCount} / {partnerKreditur.length}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Associated Creditors (Turunan Kreditur Binaan) Block */}
+                    <div className="space-y-2.5">
+                      <span className="text-[10px] text-indigo-950 font-black tracking-wider uppercase block">📋 Data Turunan Kreditur (Binaan {partner.name})</span>
+                      
+                      {partnerKreditur.length === 0 ? (
+                        <p className="text-[11px] text-slate-400 font-semibold bg-white p-4.5 rounded-xl border border-slate-100 text-center">
+                          Belum ada Kreditur yang didaftarkan oleh Mitra Marketing ini.
+                        </p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs bg-white border border-slate-100 rounded-xl overflow-hidden shadow-xs">
+                            <thead>
+                              <tr className="border-b border-slate-100 bg-slate-50 text-slate-500 font-black uppercase text-[9px] tracking-wider">
+                                <th className="py-2.5 px-3">Nama Kreditur</th>
+                                <th className="py-2.5 px-3">Kontak/No HP</th>
+                                <th className="py-2.5 px-3">Kreditur Leasing & Unit Aset</th>
+                                <th className="py-2.5 px-3">Angsuran Bulanan</th>
+                                <th className="py-2.5 px-3">Status Kontrol Denda</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
+                              {partnerKreditur.map((c) => (
+                                <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="py-3 px-3 font-bold text-slate-900">{c.name}</td>
+                                  <td className="py-3 px-3 text-slate-500 text-[11px]">{c.phone}</td>
+                                  <td className="py-3 px-3 text-slate-600">
+                                    <span className="font-bold text-slate-850 block text-[11px]">{c.lease}</span>
+                                    <span className="text-[10px] text-slate-400 block">{c.unit}</span>
+                                  </td>
+                                  <td className="py-3 px-3 font-bold text-slate-800">{c.installment}</td>
+                                  <td className="py-3 px-3">
+                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                      c.status === 'Aktif Terlindungi' ? 'bg-green-150/70 text-green-700' :
+                                      c.status === 'Terlambat - Bayar Sementara' ? 'bg-amber-150/70 text-amber-700 animate-pulse' :
+                                      'bg-blue-150/70 text-blue-700'
+                                    }`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'Aktif Terlindungi' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
+                                      {c.status}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
+      )}
+
+      {role === 'admin' && (
+        <AdminDashboard adminIdentifier={userIdentifier} onLogout={onLogout} />
       )}
 
     </div>

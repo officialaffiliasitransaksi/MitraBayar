@@ -28,14 +28,41 @@ export default function ExportModal({
   // Compile static responsive code
   const codeString = generateStaticHtml(settings, content, palette, font);
 
-  // Clipboard copy handle
+  // Clipboard copy handle with robust security fallback for iframe context
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(codeString);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(codeString);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        return;
+      }
+    } catch (e) {
+      // ignore and use robust fallback below
+    }
+
+    // Robust traditional fallback using temporary input element
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = codeString;
+      textArea.style.position = 'fixed'; // Avoid scrolling to bottom
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      if (successful) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        throw new Error('execCommand failed');
+      }
     } catch (err) {
-      alert('Fail to copy code. Please select and copy manually.');
+      // In worst-case, show clear helper text rather than blocking alert
+      setCopied(false);
     }
   };
 

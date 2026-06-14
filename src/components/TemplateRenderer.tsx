@@ -43,6 +43,12 @@ export default function TemplateRenderer({
   const [rsvpSubmitted, setRsvpSubmitted] = useState(false);
   const [rsvpName, setRsvpName] = useState('');
   const [rsvpEmail, setRsvpEmail] = useState('');
+  const [rendererAlert, setRendererAlert] = useState<string | null>(null);
+
+  const triggerRendererAlert = (msg: string) => {
+    setRendererAlert(msg);
+    setTimeout(() => setRendererAlert(null), 3500);
+  };
 
   // Inject Google Font link dynamically
   useEffect(() => {
@@ -399,7 +405,7 @@ export default function TemplateRenderer({
             <button 
               onClick={(e) => {
                 e.stopPropagation();
-                alert('Thank you! This is a mock checkout event representing the integration checkout action.');
+                triggerRendererAlert('Thank you! This is a mock checkout event representing the integration checkout action.');
               }}
               className={`w-full py-3 rounded-lg font-medium text-white shadow transition-all ${themeVars.btnBg} ${themeVars.btnHover}`}
             >
@@ -606,7 +612,7 @@ export default function TemplateRenderer({
                     if (rsvpName && rsvpEmail) {
                       setRsvpSubmitted(true);
                     } else {
-                      alert('Please provide a simulated name and email to RSVP.');
+                      triggerRendererAlert('Please provide a simulated name and email to RSVP.');
                     }
                   }}
                   className="space-y-3"
@@ -645,11 +651,25 @@ export default function TemplateRenderer({
     );
   };
 
-  switch (template) {
-    case 'portfolio': return renderPortfolio();
-    case 'product': return renderProduct();
-    case 'links': return renderLinks();
-    case 'event': return renderEvent();
-    default: return renderPortfolio();
-  }
+  const renderActiveTemplate = () => {
+    switch (template) {
+      case 'portfolio': return renderPortfolio();
+      case 'product': return renderProduct();
+      case 'links': return renderLinks();
+      case 'event': return renderEvent();
+      default: return renderPortfolio();
+    }
+  };
+
+  return (
+    <div className="relative h-full w-full">
+      {rendererAlert && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-slate-900/90 text-white text-xs px-4.5 py-2.5 rounded-full shadow-lg border border-slate-700 font-sans flex items-center gap-2 animate-bounce">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>{rendererAlert}</span>
+        </div>
+      )}
+      {renderActiveTemplate()}
+    </div>
+  );
 }
