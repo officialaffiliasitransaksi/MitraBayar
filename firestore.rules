@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\:\\.\\@]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Customer Collection Rules
+    match /customers/{customerId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() 
+        && isValidId(customerId)
+        && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+        && incoming().phone is string && incoming().phone.size() >= 5 && incoming().phone.size() <= 25
+        && incoming().lease is string && incoming().lease.size() > 0 && incoming().lease.size() <= 100
+        && incoming().unit is string && incoming().unit.size() > 0 && incoming().unit.size() <= 100
+        && incoming().installment is string && incoming().installment.size() > 0 && incoming().installment.size() <= 50
+        && incoming().status is string && incoming().status.size() > 0 && incoming().status.size() <= 100;
+      
+      allow update, delete: if isSignedIn();
+    }
+
+    // Urgent Emergency Fund Request Rules
+    match /requests/{requestId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && isValidId(requestId)
+        // Static validations
+        && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+        && incoming().phone is string && incoming().phone.size() >= 5 && incoming().phone.size() <= 25
+        && incoming().unit is string && incoming().unit.size() > 0 && incoming().unit.size() <= 100
+        && incoming().leasing is string && incoming().leasing.size() > 0 && incoming().leasing.size() <= 100
+        && incoming().amount is string && incoming().amount.size() > 0 && incoming().amount.size() <= 50
+        && incoming().status is string && incoming().status.size() > 0 && incoming().status.size() <= 50;
+      
+      allow update, delete: if isSignedIn();
+    }
+
+    // Real-time Potential Denda Tracking Alert Rules
+    match /denda/{dendaId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && isValidId(dendaId)
+        && incoming().creditorName is string && incoming().creditorName.size() > 0 && incoming().creditorName.size() <= 100
+        && incoming().phone is string && incoming().phone.size() >= 5 && incoming().phone.size() <= 25
+        && incoming().marketingName is string && incoming().marketingName.size() > 0 && incoming().marketingName.size() <= 100
+        && incoming().unit is string && incoming().unit.size() > 0 && incoming().unit.size() <= 100
+        && incoming().lease is string && incoming().lease.size() > 0 && incoming().lease.size() <= 100
+        && incoming().potentialDenda is int
+        && incoming().status is string && incoming().status.size() > 0 && incoming().status.size() <= 100;
+      
+      allow update, delete: if isSignedIn();
+    }
+
+    // Real-time Manager and Marketing Commission Rules
+    match /commissions/{commissionId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && isValidId(commissionId)
+        && incoming().creditor is string && incoming().creditor.size() > 0 && incoming().creditor.size() <= 100
+        && incoming().marketing is string && incoming().marketing.size() > 0 && incoming().marketing.size() <= 100
+        && incoming().finePaid is string && incoming().finePaid.size() > 0 && incoming().finePaid.size() <= 50
+        && incoming().status is string && incoming().status.size() > 0 && incoming().status.size() <= 50;
+      
+      allow update, delete: if isSignedIn();
+    }
+  }
+}

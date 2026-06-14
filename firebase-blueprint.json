@@ -1,0 +1,194 @@
+{
+  "entities": {
+    "customer": {
+      "title": "Customer",
+      "description": "Information about registered creditors/customers managed by marketing or manager.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Full name of the customer"
+        },
+        "phone": {
+          "type": "string",
+          "description": "WhatsApp number of the customer"
+        },
+        "lease": {
+          "type": "string",
+          "description": "Leasing provider brand"
+        },
+        "unit": {
+          "type": "string",
+          "description": "The motorbike/car unit"
+        },
+        "installment": {
+          "type": "string",
+          "description": "Formated installment amount"
+        },
+        "status": {
+          "type": "string",
+          "description": "Active protection status"
+        },
+        "marketingId": {
+          "type": "string",
+          "description": "ID of the marketing agent who registered this customer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the customer was created"
+        }
+      },
+      "required": ["name", "phone", "lease", "unit", "installment", "status"]
+    },
+    "request": {
+      "title": "Emergency Fund Request",
+      "description": "Emergency bailout fund request submitted by customer or marketing, reviewed by manager.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the creditor requesting fund"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact number"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Target vehicle unit"
+        },
+        "leasing": {
+          "type": "string",
+          "description": "Leasing provider"
+        },
+        "amount": {
+          "type": "string",
+          "description": "Requested bailout amount"
+        },
+        "delayedDays": {
+          "type": "number",
+          "description": "Days delayed on leasing payment"
+        },
+        "score": {
+          "type": "number",
+          "description": "AI Credit score"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for emergency bailout request"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current authorization status: Menunggu Verifikasi, Disetujui, Ditolak"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the request was initiated"
+        }
+      },
+      "required": ["name", "phone", "unit", "leasing", "amount", "status"]
+    },
+    "commission": {
+      "title": "Commission",
+      "description": "Commission details disbursed to marketing or managers from payments/fine bailouts.",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Readable transaction date"
+        },
+        "creditor": {
+          "type": "string",
+          "description": "The creditor involved"
+        },
+        "marketing": {
+          "type": "string",
+          "description": "Name or ID of marketing associated"
+        },
+        "finePaid": {
+          "type": "string",
+          "description": "Fine paid amount"
+        },
+        "managerCommission": {
+          "type": "string",
+          "description": "Manager's commission processed"
+        },
+        "status": {
+          "type": "string",
+          "description": "Disbursement or settlement status"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["creditor", "marketing", "finePaid", "status"]
+    },
+    "denda": {
+      "title": "Potential Denda Alert",
+      "description": "Real-time warning tracking of customer-associated fine records.",
+      "type": "object",
+      "properties": {
+        "creditorName": {
+          "type": "string",
+          "description": "Name of the creditor with potential fine"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone"
+        },
+        "marketingName": {
+          "type": "string",
+          "description": "Reference marketing agent name & ID"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Vehicle asset"
+        },
+        "lease": {
+          "type": "string",
+          "description": "Leasing target"
+        },
+        "potentialDenda": {
+          "type": "number",
+          "description": "Potential fine amount in IDR"
+        },
+        "probPercent": {
+          "type": "number",
+          "description": "AI predicted delay probability percentage"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current delay status message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when alert started"
+        }
+      },
+      "required": ["creditorName", "phone", "marketingName", "unit", "lease", "potentialDenda", "status"]
+    }
+  },
+  "firestore": {
+    "/customers/{customerId}": {
+      "schema": "customer",
+      "description": "Main customer/debtor list"
+    },
+    "/requests/{requestId}": {
+      "schema": "request",
+      "description": "Emergency bailout authorization stream"
+    },
+    "/commissions/{commissionId}": {
+      "schema": "commission",
+      "description": "Real-time manager and marketing commission flow records"
+    },
+    "/denda/{dendaId}": {
+      "schema": "denda",
+      "description": "Real-time potential fines track"
+    }
+  }
+}

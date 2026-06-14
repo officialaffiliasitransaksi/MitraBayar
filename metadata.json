@@ -1,0 +1,6 @@
+{
+  "name": "Website Builder",
+  "description": "An elegant, interactive single-page website builder with dynamic responsive templates, custom typography/color configurations, real-time live previewing, and clean HTML/CSS code export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
