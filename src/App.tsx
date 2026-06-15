@@ -147,9 +147,9 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
   }, []);
 
   const navLinks = [
-    { name: 'Beranda', href: '#home' },
+    { name: 'Home', href: '#home' },
     { name: 'Program', href: '#program' },
-    { name: 'Cara Kerja', href: '#how-it-works' },
+    { name: 'Sistem', href: '#how-it-works' },
     { name: 'Syarat', href: '#requirements' },
     { name: 'Testimony', href: '#testimony' },
     { name: 'FAQ', href: '#faq' },
@@ -220,13 +220,13 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
                 className="bg-blue-50 hover:bg-blue-600 border border-blue-200 text-blue-700 hover:text-white px-5 py-2.5 rounded-full font-bold transition-all text-sm flex items-center gap-1.5 shadow-xs cursor-pointer"
               >
                 <User size={16} />
-                <span>Akses Mitra Finance</span>
+                <span>Akses</span>
               </button>
             )}
 
             <a href="#download" onClick={(e) => handleLinkClick(e, '#download')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-md hover:shadow-lg flex items-center gap-2 transform hover:-translate-y-0.5 text-sm">
               <Download size={18} />
-              Unduh Aplikasi
+              Download
             </a>
 
             <a 
@@ -238,7 +238,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
                   : 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200 text-indigo-700'
               }`}
             >
-              📊 Potensi Hasil
+              📊 Potensi
             </a>
           </nav>
 
@@ -301,7 +301,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
                 className="flex justify-center items-center gap-2 w-full px-4 py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200 hover:from-blue-100 hover:to-blue-200 transition-colors cursor-pointer"
               >
                 <User size={20} />
-                <span>Akses Mitra Finance</span>
+                <span>Akses</span>
               </button>
             </div>
           )}
@@ -313,7 +313,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
               onClick={(e) => handleLinkClick(e, '#download')}
             >
               <Download size={20} />
-              Unduh Aplikasi Sekarang
+              Download
             </a>
           </div>
 
@@ -327,7 +327,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
               }`}
               onClick={(e) => handleLinkClick(e, '#potensi-hasil')}
             >
-              📊 Potensi Hasil & Ekosistem
+              📊 Potensi
             </a>
           </div>
         </div>
