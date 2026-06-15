@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import LoginModal from './components/LoginModal';
 import RoleDashboards from './components/RoleDashboards';
+import PotensiHasil from './components/PotensiHasil';
 
 interface MitraBayarLogoProps {
   size?: number;
@@ -129,9 +130,11 @@ interface HeaderProps {
   isLoggedIn: boolean;
   userRole: 'customer' | 'marketing' | 'manager' | 'admin' | null;
   onLogout: () => void;
+  currentView: 'landing' | 'potensi';
+  onChangeView: (view: 'landing' | 'potensi', targetHref?: string) => void;
 }
 
-const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) => {
+const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onChangeView }: HeaderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -146,18 +149,32 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
   const navLinks = [
     { name: 'Beranda', href: '#home' },
     { name: 'Program', href: '#program' },
+    { name: 'Potensi Hasil', href: '#potensi-hasil' },
     { name: 'Cara Kerja', href: '#how-it-works' },
     { name: 'Syarat', href: '#requirements' },
     { name: 'Testimony', href: '#testimony' },
     { name: 'FAQ', href: '#faq' },
   ];
 
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement | HTMLDivElement>, href: string) => {
+    e.preventDefault();
+    setIsOpen(false);
+    if (href === '#potensi-hasil') {
+      onChangeView('potensi', '#potensi-hasil');
+    } else {
+      onChangeView('landing', href);
+    }
+  };
+
   return (
     <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-2' : 'bg-white py-3 sm:py-4'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center cursor-pointer">
+          <div 
+            className="flex-shrink-0 flex items-center cursor-pointer"
+            onClick={(e) => handleLinkClick(e, '#home')}
+          >
             <MitraBayarLogo size={36} showText={true} />
           </div>
 
@@ -167,7 +184,13 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
               <a 
                 key={link.name} 
                 href={link.href} 
-                className="text-gray-600 hover:text-blue-600 font-medium text-sm transition-colors"
+                onClick={(e) => handleLinkClick(e, link.href)}
+                className={`font-medium text-sm transition-colors ${
+                  (link.href === '#potensi-hasil' && currentView === 'potensi') || 
+                  (link.href !== '#potensi-hasil' && currentView === 'landing' && window.location.hash === link.href)
+                    ? 'text-blue-600 font-bold' 
+                    : 'text-gray-600 hover:text-blue-600'
+                }`}
               >
                 {link.name}
               </a>
@@ -202,7 +225,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
               </button>
             )}
 
-            <a href="#download" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-md hover:shadow-lg flex items-center gap-2 transform hover:-translate-y-0.5 text-sm">
+            <a href="#download" onClick={(e) => handleLinkClick(e, '#download')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-md hover:shadow-lg flex items-center gap-2 transform hover:-translate-y-0.5 text-sm">
               <Download size={18} />
               Unduh Aplikasi
             </a>
@@ -227,8 +250,12 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
             <a
               key={link.name}
               href={link.href}
-              className="block px-4 py-3 rounded-lg text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-              onClick={() => setIsOpen(false)}
+              className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                (link.href === '#potensi-hasil' && currentView === 'potensi')
+                  ? 'text-blue-600 bg-blue-50 font-bold'
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+              onClick={(e) => handleLinkClick(e, link.href)}
             >
               {link.name}
             </a>
@@ -272,7 +299,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
             <a 
               href="#download" 
               className="flex justify-center items-center gap-2 w-full px-4 py-3 rounded-xl text-base font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-colors"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => handleLinkClick(e, '#download')}
             >
               <Download size={20} />
               Unduh Aplikasi Sekarang
@@ -1708,6 +1735,31 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<'customer' | 'marketing' | 'manager' | 'admin' | null>(null);
   const [userIdentifier, setUserIdentifier] = useState('');
+  const [activeView, setActiveView] = useState<'landing' | 'potensi'>('landing');
+  const [deferredAnchor, setDeferredAnchor] = useState<string | null>(null);
+
+  // Sync scroll on view switch Or hash link clicks
+  useEffect(() => {
+    if (deferredAnchor) {
+      const element = document.querySelector(deferredAnchor);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        // Set actual window hash to match link expectation
+        window.history.pushState(null, '', deferredAnchor);
+        setDeferredAnchor(null);
+      } else {
+        const timer = setTimeout(() => {
+          const retryElement = document.querySelector(deferredAnchor);
+          if (retryElement) {
+            retryElement.scrollIntoView({ behavior: 'smooth' });
+            window.history.pushState(null, '', deferredAnchor);
+          }
+          setDeferredAnchor(null);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [activeView, deferredAnchor]);
 
   const handleLoginSuccess = (role: 'customer' | 'marketing' | 'manager' | 'admin', identifier: string) => {
     setIsLoggedIn(true);
@@ -1721,6 +1773,16 @@ export default function App() {
     setUserIdentifier('');
   };
 
+  const handleChangeView = (view: 'landing' | 'potensi', targetHref?: string) => {
+    setActiveView(view);
+    if (targetHref) {
+      setDeferredAnchor(targetHref);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.history.pushState(null, '', '#');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f0f9ff] via-[#e2f1fc] to-[#f8fafc] font-sans selection:bg-blue-200 selection:text-blue-900 scroll-smooth">
       <Header 
@@ -1728,6 +1790,8 @@ export default function App() {
         isLoggedIn={isLoggedIn}
         userRole={userRole}
         onLogout={handleLogout}
+        currentView={activeView}
+        onChangeView={handleChangeView}
       />
       <main className="relative">
         {isLoggedIn && userRole ? (
@@ -1737,6 +1801,12 @@ export default function App() {
               userIdentifier={userIdentifier}
               onLogout={handleLogout}
             />
+          </div>
+        ) : activeView === 'potensi' ? (
+          <div className="pt-24">
+            <PotensiHasil />
+            <CTA />
+            <Footer />
           </div>
         ) : (
           <>
