@@ -378,7 +378,7 @@ const HeroSection = ({ onOpenLogin }: { onOpenLogin: () => void }) => {
           <div className="w-full lg:w-[55%] text-center lg:text-left animate-fade-in-up">
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#0d2e5c] leading-[1.1] mb-4 tracking-tight">
-              Bangun Kepercayaan<br className="hidden sm:block" /> Nama Anda di Komunitas Finance
+              Bangun Kepercayaan<br className="hidden sm:block" /> Nama Anda di Ekosistem Finance Indonesia
             </h1>
             
             <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-5 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
