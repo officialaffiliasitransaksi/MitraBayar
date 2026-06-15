@@ -149,7 +149,6 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
   const navLinks = [
     { name: 'Beranda', href: '#home' },
     { name: 'Program', href: '#program' },
-    { name: 'Potensi Hasil', href: '#potensi-hasil' },
     { name: 'Cara Kerja', href: '#how-it-works' },
     { name: 'Syarat', href: '#requirements' },
     { name: 'Testimony', href: '#testimony' },
@@ -229,6 +228,18 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
               <Download size={18} />
               Unduh Aplikasi
             </a>
+
+            <a 
+              href="#potensi-hasil" 
+              onClick={(e) => handleLinkClick(e, '#potensi-hasil')} 
+              className={`px-5 py-2.5 rounded-full font-bold transition-all text-sm flex items-center gap-1.5 cursor-pointer border transform hover:-translate-y-0.5 shadow-sm hover:shadow-md ${
+                currentView === 'potensi'
+                  ? 'bg-indigo-600 text-white border-indigo-700 font-extrabold'
+                  : 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200 text-indigo-700'
+              }`}
+            >
+              📊 Potensi Hasil
+            </a>
           </nav>
 
           {/* Mobile menu button */}
@@ -251,7 +262,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
               key={link.name}
               href={link.href}
               className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
-                (link.href === '#potensi-hasil' && currentView === 'potensi')
+                currentView === 'landing' && window.location.hash === link.href
                   ? 'text-blue-600 bg-blue-50 font-bold'
                   : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
               }`}
@@ -295,7 +306,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
             </div>
           )}
 
-          <div className="pt-2 pb-2">
+          <div className="pt-2 pb-1">
             <a 
               href="#download" 
               className="flex justify-center items-center gap-2 w-full px-4 py-3 rounded-xl text-base font-bold bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-colors"
@@ -303,6 +314,20 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout, currentView, onCh
             >
               <Download size={20} />
               Unduh Aplikasi Sekarang
+            </a>
+          </div>
+
+          <div className="pt-1 pb-2">
+            <a 
+              href="#potensi-hasil" 
+              className={`flex justify-center items-center gap-2 w-full px-4 py-3 rounded-xl text-base font-bold transition-colors border shadow-sm ${
+                currentView === 'potensi'
+                  ? 'bg-indigo-600 text-white border-indigo-750'
+                  : 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200 text-indigo-700'
+              }`}
+              onClick={(e) => handleLinkClick(e, '#potensi-hasil')}
+            >
+              📊 Potensi Hasil & Ekosistem
             </a>
           </div>
         </div>

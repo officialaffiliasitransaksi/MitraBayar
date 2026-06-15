@@ -11,13 +11,15 @@ import {
   Calculator, 
   Sparkles, 
   CheckCircle,
-  HelpCircle
+  HelpCircle,
+  Award
 } from 'lucide-react';
 
 export default function PotensiHasil() {
   // Simulator State
   const [totalUserTarget, setTotalUserTarget] = useState(1000000); // 1 Million total download target
   const [penetrationRate, setPenetrationRate] = useState(10); // 10% penetration rate default
+  const [txCount, setTxCount] = useState<string>('10'); // Default to 10 transactions (perfect score)
   
   // Calculate debiturs
   const activeDebitur = Math.round((totalUserTarget * penetrationRate) / 100);
@@ -412,7 +414,259 @@ export default function PotensiHasil() {
           </div>
         </div>
 
-        {/* 4. PERISAI KEAMANAN STRUKTURAL */}
+        {/* 4. KALKULATOR RUMUS SKOR & KELAYAKAN TALANGAN DENDA */}
+        <div id="rumus-skor-talangan" className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-10 shadow-lg mb-16 space-y-8 text-left relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 mt-10 mr-10 rounded-full blur-2xl pointer-events-none opacity-40"></div>
+          
+          <div className="border-b border-slate-100 pb-5">
+            <span className="inline-flex items-center gap-1.5 text-[10px] bg-blue-50 text-blue-700 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+              <Calculator size={12} /> SISTEM SKOR LOYALITAS MITRA
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-[#0d2e5c]">
+              Menu Rumus Skor Kelayakan Talangan Denda
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Evaluasi otomatis status kelayakan debitur untuk mendapatkan bantuan dana talangan penyelesaian denda angsuran finance berdasarkan frekuensi transaksi bulanan.
+            </p>
+          </div>
+
+          {/* Kolom Input Utama & Analisis */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Input Form Column */}
+            <div className="lg:col-span-4 bg-slate-50/70 p-6 rounded-2xl border border-slate-100 space-y-5">
+              <div>
+                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+                  Jumlah Transaksi Debitur (Bulanan)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="Contoh: 10"
+                    value={txCount}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '' || (parseInt(val) >= 0 && parseInt(val) <= 100)) {
+                        setTxCount(val);
+                      }
+                    }}
+                    className="w-full px-4 py-3 bg-white border border-slate-250 rounded-xl font-bold text-slate-800 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                    Transaksi
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-450 mt-2 leading-relaxed">
+                  Ketik angka transaksi di atas. Coba ketik <strong className="text-slate-600">1</strong> atau <strong className="text-emerald-600">10</strong> untuk melihat simulasi perbedaan skor dan status kelayakan langsung secara instan.
+                </p>
+              </div>
+
+              {/* Quick Actions preset */}
+              <div className="space-y-2">
+                <span className="block text-[10px] font-bold text-slate-500 uppercase">Preset Cepat:</span>
+                <div className="flex flex-wrap gap-2">
+                  {[1, 3, 5, 10, 15].map((preset) => (
+                    <button
+                      key={preset}
+                      onClick={() => setTxCount(preset.toString())}
+                      className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                        parseInt(txCount) === preset
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {preset} Transaksi
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-[11.5px] text-blue-900 leading-relaxed font-semibold flex items-start gap-2">
+                <span className="shrink-0 mt-0.5">💡</span>
+                <span>Setiap transaksi sukses menyumbang <strong className="text-blue-800">10 Poin Skor</strong>. Target minimal kelayakan talangan mandiri adalah <strong className="text-blue-850">100 Poin (10 Transaksi)</strong>.</span>
+              </div>
+            </div>
+
+            {/* Kolom Hasil & Analisis (Format Tampilan Kolom) */}
+            <div className="lg:col-span-8 space-y-6">
+              
+              {/* Output Columns Dashboard */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                {/* Column 1: Kalkulasi Skor */}
+                <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg w-fit">
+                      <Award size={18} />
+                    </div>
+                    <span className="block text-[9px] text-indigo-600 font-extrabold uppercase tracking-widest">AKUMULASI SKOR</span>
+                    <h4 className="text-3xl font-black text-slate-800 tracking-tight">
+                      {Math.min((parseInt(txCount) || 0) * 10, 100)} <span className="text-xs text-slate-400">/ 100 Poin</span>
+                    </h4>
+                  </div>
+                  
+                  <div className="mt-4 pt-3 border-t border-slate-100">
+                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          ((parseInt(txCount) || 0) * 10) >= 100 ? 'bg-emerald-500' : 'bg-indigo-500'
+                        }`}
+                        style={{ width: `${Math.min(((parseInt(txCount) || 0) * 10), 100)}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-bold block mt-1">Loyalty progress denda</span>
+                  </div>
+                </div>
+
+                {/* Column 2: Status Kelayakan */}
+                <div className={`border p-5 rounded-2xl shadow-xs transition-all flex flex-col justify-between ${
+                  ((parseInt(txCount) || 0) * 10) >= 100 
+                    ? 'bg-emerald-50/40 border-emerald-250' 
+                    : 'bg-amber-50/30 border-amber-200'
+                }`}>
+                  <div className="space-y-2">
+                    <div className={`p-2 rounded-lg w-fit ${
+                      ((parseInt(txCount) || 0) * 10) >= 100 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      {((parseInt(txCount) || 0) * 10) >= 100 ? <CheckCircle size={18} /> : <HelpCircle size={18} />}
+                    </div>
+                    <span className="block text-[9px] text-slate-500 font-extrabold uppercase tracking-widest">STATUS OTORISASI</span>
+                    <p className={`text-sm font-black leading-tight mt-1 ${
+                      ((parseInt(txCount) || 0) * 10) >= 100 ? 'text-emerald-800' : 'text-amber-800'
+                    }`}>
+                      {((parseInt(txCount) || 0) * 10) >= 100 
+                        ? '🟢 LAYAK / ELIGIBLE' 
+                        : '🚨 BELUM LAYAK / AJUKAN DONGKRAK'}
+                    </p>
+                  </div>
+                  
+                  <div className="mt-4 pt-3 border-t border-slate-150/60 text-[10px] text-slate-500 leading-snug">
+                    {((parseInt(txCount) || 0) * 10) >= 100 
+                      ? 'Diberikan fasilitas dana talangan denda angsuran finance 100% tanpa potongan admin!'
+                      : 'Kekurangan transaksi terdeteksi. Debitur harus menambah minimal ' + Math.max(10 - (parseInt(txCount) || 0), 0) + ' transaksi lagi.'
+                    }
+                  </div>
+                </div>
+
+                {/* Column 3: Estimasi Plafon & Bunga */}
+                <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg w-fit">
+                      <Coins size={18} />
+                    </div>
+                    <span className="block text-[9px] text-blue-600 font-extrabold uppercase tracking-widest">DANA TALANGAN MAKS</span>
+                    <h4 className="text-xl font-bold text-slate-805 tracking-tight">
+                      {((parseInt(txCount) || 0) * 10) >= 100 ? 'Rp 5.000.000' : 'Rp ' + (((parseInt(txCount) || 0) * 500000).toLocaleString('id-ID'))}
+                    </h4>
+                  </div>
+                  
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-[10px]">
+                    <span className="text-slate-450 font-semibold">Tingkat Bunga:</span>
+                    <span className={`font-black px-1.5 py-0.5 rounded ${
+                      ((parseInt(txCount) || 0) * 10) >= 100 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                    }`}>
+                      {((parseInt(txCount) || 0) * 10) >= 100 ? '0% Bunga' : '1.5% Tenor'}
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Tabel Skala Penilaian Kolom (Reference Grid) */}
+              <div className="border border-slate-150 rounded-2xl overflow-hidden shadow-xs bg-white">
+                <div className="bg-slate-50 p-4 border-b border-slate-150 flex justify-between items-center">
+                  <div>
+                    <h4 className="text-xs font-black text-slate-800">Tabel Rumus Distribusi Hubungan Transaksi vs Skor Kelayakan</h4>
+                    <p className="text-[10px] text-slate-450">Standarisasi legalitas verifikasi denda di system otomatisasi MitraBayar.</p>
+                  </div>
+                  <span className="text-[9px] font-mono bg-blue-50 text-blue-700 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider block w-max">Mitra Otoritas</span>
+                </div>
+                
+                <div className="divide-y divide-slate-100 text-xs">
+                  {/* Table Header */}
+                  <div className="grid grid-cols-12 gap-2 p-3 bg-slate-50/40 text-slate-500 font-extrabold uppercase text-[9px] tracking-wider text-center">
+                    <div className="col-span-3 text-left">Jumlah Transaksi</div>
+                    <div className="col-span-3">Poin Skor yang Diperoleh</div>
+                    <div className="col-span-4">Status & Kelayakan Dana Talangan</div>
+                    <div className="col-span-2 text-right">Plafon Cair</div>
+                  </div>
+
+                  {/* Row 1 Transaksi */}
+                  <div className={`grid grid-cols-12 gap-2 p-3 items-center text-center transition-colors ${parseInt(txCount) === 1 ? 'bg-blue-50/60 font-semibold' : ''}`}>
+                    <div className="col-span-3 text-left flex items-center gap-1.5 font-bold text-slate-700 font-sans">
+                      <span>1 Transaksi</span>
+                      {parseInt(txCount) === 1 && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>}
+                    </div>
+                    <div className="col-span-3 font-mono font-bold text-indigo-600 text-sm">10 Poin</div>
+                    <div className="col-span-4">
+                      <span className="px-2 py-0.5 bg-rose-50 text-rose-700 rounded-full font-extrabold text-[9px] tracking-wide uppercase">🚫 Tidak Layak (Skor Terlampau Rendah)</span>
+                    </div>
+                    <div className="col-span-2 text-right font-semibold text-slate-500 font-mono">Rp 500.000</div>
+                  </div>
+
+                  {/* Row 3 Transaksi */}
+                  <div className={`grid grid-cols-12 gap-2 p-3 items-center text-center transition-colors ${parseInt(txCount) === 3 ? 'bg-blue-50/60 font-semibold' : ''}`}>
+                    <div className="col-span-3 text-left flex items-center gap-1.5 font-bold text-slate-700 font-sans">
+                      <span>3 Transaksi</span>
+                      {parseInt(txCount) === 3 && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>}
+                    </div>
+                    <div className="col-span-3 font-mono font-bold text-indigo-600 text-sm">30 Poin</div>
+                    <div className="col-span-4">
+                      <span className="px-2 py-0.5 bg-rose-50 text-rose-700 rounded-full font-extrabold text-[9px] tracking-wide uppercase">🚫 Tidak Layak (Skor Terlampau Rendah)</span>
+                    </div>
+                    <div className="col-span-2 text-right font-semibold text-slate-500 font-mono">Rp 1.500.000</div>
+                  </div>
+
+                  {/* Row 5 Transaksi */}
+                  <div className={`grid grid-cols-12 gap-2 p-3 items-center text-center transition-colors ${parseInt(txCount) === 5 ? 'bg-blue-50/60 font-semibold' : ''}`}>
+                    <div className="col-span-3 text-left flex items-center gap-1.5 font-bold text-slate-700 font-sans">
+                      <span>5 Transaksi</span>
+                      {parseInt(txCount) === 5 && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>}
+                    </div>
+                    <div className="col-span-3 font-mono font-bold text-indigo-600 text-sm">50 Poin</div>
+                    <div className="col-span-4">
+                      <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full font-extrabold text-[9px] tracking-wide uppercase">⚠️ Masa Pantau (Butuh Co-Signer)</span>
+                    </div>
+                    <div className="col-span-2 text-right font-semibold text-slate-500 font-mono">Rp 2.500.000</div>
+                  </div>
+
+                  {/* Row 10 Transaksi */}
+                  <div className={`grid grid-cols-12 gap-2 p-3 items-center text-center transition-colors ${parseInt(txCount) === 10 ? 'bg-emerald-50 font-bold' : ''}`}>
+                    <div className="col-span-3 text-left flex items-center gap-1.5 font-extrabold text-emerald-850 font-sans">
+                      <span>10 Transaksi</span>
+                      {(parseInt(txCount) === 10 || (parseInt(txCount) >= 10 && parseInt(txCount) < 15)) && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>}
+                    </div>
+                    <div className="col-span-3 font-mono font-extrabold text-emerald-600 text-sm">100 Poin</div>
+                    <div className="col-span-4">
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-extrabold text-[9px] tracking-wide uppercase">🟢 LAYAK UTAMA (Penuh Tanpa Potongan)</span>
+                    </div>
+                    <div className="col-span-2 text-right font-black text-emerald-700 font-mono">Rp 5.000.000</div>
+                  </div>
+
+                  {/* Row 15+ Transaksi */}
+                  <div className={`grid grid-cols-12 gap-2 p-3 items-center text-center transition-colors ${parseInt(txCount) >= 15 ? 'bg-emerald-100/50 font-bold' : ''}`}>
+                    <div className="col-span-3 text-left flex items-center gap-1.5 font-extrabold text-[#0d2e5c] font-sans">
+                      <span>15+ Transaksi</span>
+                      {parseInt(txCount) >= 15 && <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>}
+                    </div>
+                    <div className="col-span-3 font-mono font-black text-indigo-700 text-sm">100+ Poin</div>
+                    <div className="col-span-4">
+                      <span className="px-2 py-0.5 bg-[#0d2e5c] text-white rounded-full font-extrabold text-[9px] tracking-wide uppercase">👑 PRIORITAS VVIP (Bailout Instan)</span>
+                    </div>
+                    <div className="col-span-2 text-right font-black text-indigo-700 font-mono">Rp 7.500.000</div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        {/* 5. PERISAI KEAMANAN STRUKTURAL */}
         <div className="bg-slate-900 text-white p-6 sm:p-10 rounded-3xl border border-slate-800 relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
           

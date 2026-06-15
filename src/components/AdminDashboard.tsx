@@ -28,7 +28,8 @@ import {
   BarChart3,
   Percent,
   TrendingDown,
-  Sparkles
+  Sparkles,
+  Coins
 } from 'lucide-react';
 import { 
   collection, 
@@ -93,7 +94,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
   const [bonusAmount, setBonusAmount] = useState('50000');
   const [bonusTargetAgent, setBonusTargetAgent] = useState('MB-7789');
 
-  // Interactive dynamic simulator for 10% / 40% / 50% split of bailout funds
+  // Interactive dynamic simulator for 10% / 15% / 25% / 50% split of bailout funds
   const [simulatedBailoutAmount, setSimulatedBailoutAmount] = useState('2500000');
 
   // Sync Customers
@@ -320,16 +321,19 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
 
   // Split configurations based on user rules:
   // - 10% to Manager Finance based on recruitment
-  // - 40% to Marketing Finance based on direct creditor recruitment
-  // - 50% to Aplikator (Sistem Utama)
+  // - 15% to Marketing Finance based on direct creditor recruitment
+  // - 25% to Aplikator (Sistem Utama)
+  // - 50% to Alokasi Perputaran Dana Talangan Selanjutnya
   const allocationPctManager = 10;
-  const allocationPctMarketing = 40;
-  const allocationPctSystem = 50;
+  const allocationPctMarketing = 15;
+  const allocationPctSystem = 25;
+  const allocationPctNextBailout = 50;
 
   const totalBailoutDisbursed = globalDanaKeluar;
   const allocationManagerValue = totalBailoutDisbursed * (allocationPctManager / 100);
   const allocationMarketingValue = totalBailoutDisbursed * (allocationPctMarketing / 100);
   const allocationSystemValue = totalBailoutDisbursed * (allocationPctSystem / 100);
+  const allocationNextBailoutValue = totalBailoutDisbursed * (allocationPctNextBailout / 100);
 
   // 7. Pendapatan biaya admin transaksi PPOB
   // Consists of base simulation of 13,900 general app utility payments + structured fee metrics from active users
@@ -569,7 +573,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
               </h3>
             </div>
             <p className="text-xs text-slate-300 font-semibold mt-1.5 mb-0">
-              Rasio Alokasi Finansial Pengisian Kas Kontingensi: <strong className="text-indigo-300">10% Manager Finance</strong> (Sesuai Rekrutmen) &bull; <strong className="text-fuchsia-300">40% Marketing Finance</strong> (Sesuai Direct Rekrutan) &bull; <strong className="text-emerald-300">50% Aplikator</strong>
+              Rasio Alokasi Finansial Pengisian Kas Kontingensi: <strong className="text-indigo-300">10% Manager Financial Pusat</strong> &bull; <strong className="text-fuchsia-300">15% Marketing</strong> &bull; <strong className="text-emerald-300">25% Aplikator</strong> &bull; <strong className="text-amber-300">50% Alokasi Perputaran Dana Talangan Selanjutnya</strong>
             </p>
           </div>
           
@@ -579,38 +583,45 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
           </div>
         </div>
 
-        {/* The 3-tier visual split progress meter */}
+        {/* The 4-tier visual split progress meter */}
         <div className="space-y-2.5 bg-slate-950/40 p-4.5 rounded-2xl border border-white/5">
           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400">
             <span>Visualisasi Pembagian Dana Pembayaran</span>
-            <span className="text-slate-300 font-mono">Porsi: 10% | 40% | 50%</span>
+            <span className="text-slate-300 font-mono">Porsi: 10% | 15% | 25% | 50%</span>
           </div>
           <div className="h-5 rounded-full overflow-hidden flex shadow-inner border border-white/10">
             <div 
               style={{ width: `${allocationPctManager}%` }} 
               className="bg-indigo-500 h-full flex items-center justify-center text-[9px] font-black text-white px-1 transition-all"
-              title="10% Manager Finance"
+              title="10% Manager Financial Pusat"
             >
               MGR (10%)
             </div>
             <div 
               style={{ width: `${allocationPctMarketing}%` }} 
               className="bg-fuchsia-500 h-full flex items-center justify-center text-[9px] font-black text-white px-1 transition-all"
-              title="40% Marketing Finance"
+              title="15% Marketing"
             >
-              MKT (40%)
+              MKT (15%)
             </div>
             <div 
               style={{ width: `${allocationPctSystem}%` }} 
               className="bg-emerald-500 h-full flex items-center justify-center text-[9px] font-black text-white px-1 transition-all"
-              title="50% Aplikator"
+              title="25% Aplikator"
             >
-              APLIKATOR (50%)
+              APLIKATOR (25%)
+            </div>
+            <div 
+              style={{ width: `${allocationPctNextBailout}%` }} 
+              className="bg-amber-500 h-full flex items-center justify-center text-[9px] font-black text-slate-950 px-1 transition-all"
+              title="50% Alokasi Perputaran Dana Talangan Selanjutnya"
+            >
+              TALANGAN (50%)
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            {/* Box 1: Manager Finance */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+            {/* Box 1: Manager Financial Pusat */}
             <div className="bg-[#10243a] border border-indigo-500/30 rounded-xl p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-center">
@@ -619,9 +630,9 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                   </span>
                   <Award size={14} className="text-indigo-400" />
                 </div>
-                <h4 className="text-xs font-extrabold text-indigo-150 mt-2 m-0">Manager Finance Hub</h4>
-                <p className="text-[11px] text-slate-300 mt-1 mb-0 leading-relaxed">
-                  Didistribusikan untuk penasihat regional yang mengawasi rekrutmen operasional serta keputusan uji kelayakan angsuran darurat.
+                <h4 className="text-xs font-extrabold text-indigo-150 mt-2 m-0">Manager Financial Pusat</h4>
+                <p className="text-[11px] text-slate-350 mt-1 mb-0 leading-relaxed">
+                  Didistribusikan untuk penasihat regional dan pusat yang mengawasi rekrutmen operasional serta keputusan uji kelayakan angsuran darurat.
                 </p>
               </div>
               <div className="mt-3 border-t border-indigo-500/20 pt-2 flex justify-between items-end">
@@ -630,17 +641,17 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
               </div>
             </div>
 
-            {/* Box 2: Marketing Finance */}
+            {/* Box 2: Marketing */}
             <div className="bg-[#191a33] border border-fuchsia-500/30 rounded-xl p-3.5 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-center">
                   <span className="px-2 py-0.5 bg-fuchsia-500/20 text-fuchsia-300 text-[9px] font-black rounded-lg uppercase tracking-wider">
-                    Porsi 40%
+                    Porsi 15%
                   </span>
                   <Briefcase size={14} className="text-fuchsia-400" />
                 </div>
                 <h4 className="text-xs font-extrabold text-fuchsia-150 mt-2 m-0">Marketing Finance Agent</h4>
-                <p className="text-[11px] text-slate-300 mt-1 mb-0 leading-relaxed">
+                <p className="text-[11px] text-slate-350 mt-1 mb-0 leading-relaxed">
                   Disalurkan kepada mitra marketing lapangan yang merekrut secara langsung (direct referral) debitur/peminjam dan melakukan kunjungan.
                 </p>
               </div>
@@ -655,18 +666,38 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
               <div>
                 <div className="flex justify-between items-center">
                   <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-[9px] font-black rounded-lg uppercase tracking-wider">
-                    Porsi 50%
+                    Porsi 25%
                   </span>
                   <Percent size={14} className="text-emerald-400" />
                 </div>
                 <h4 className="text-xs font-extrabold text-emerald-150 mt-2 m-0">Aplikator (Kas Utama)</h4>
-                <p className="text-[11px] text-slate-300 mt-1 mb-0 leading-relaxed">
-                  Dimasukkan kembali ke kas utama operasional Aplikator Mitra Bayar sebagai sirkulasi dana bergulir penjaminan transaksi denda darurat.
+                <p className="text-[11px] text-slate-350 mt-1 mb-0 leading-relaxed">
+                  Dimasukkan kembali ke kas utama operasional Aplikator Mitra Bayar sebagai sirkulasi biaya pemeliharaan sistem dan operasional.
                 </p>
               </div>
               <div className="mt-3 border-t border-emerald-500/20 pt-2 flex justify-between items-end">
                 <span className="text-[9px] text-emerald-300 font-extrabold uppercase">Nilai Akrual</span>
                 <span className="text-sm font-black font-mono text-emerald-300">Rp {allocationSystemValue.toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+
+            {/* Box 4: Alokasi Perputaran Dana Talangan Selanjutnya */}
+            <div className="bg-[#241a08] border border-amber-500/30 rounded-xl p-3.5 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-center">
+                  <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-[9px] font-black rounded-lg uppercase tracking-wider">
+                    Porsi 50%
+                  </span>
+                  <Coins size={14} className="text-amber-400" />
+                </div>
+                <h4 className="text-xs font-extrabold text-amber-150 mt-2 m-0">Dana Talangan Selanjutnya</h4>
+                <p className="text-[11px] text-slate-350 mt-1 mb-0 leading-relaxed">
+                  Masuk ke alokasi perputaran dana talangan selanjutnya guna jaminan likuiditas penyerahan dana darurat debitur berikutnya.
+                </p>
+              </div>
+              <div className="mt-3 border-t border-amber-500/20 pt-2 flex justify-between items-end">
+                <span className="text-[9px] text-amber-300 font-extrabold uppercase">Nilai Akrual</span>
+                <span className="text-sm font-black font-mono text-amber-300">Rp {allocationNextBailoutValue.toLocaleString('id-ID')}</span>
               </div>
             </div>
           </div>
@@ -733,23 +764,29 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
           </div>
 
           {/* Live Output calculations */}
-          <div className="lg:col-span-6 xl:col-span-4 bg-slate-950/80 p-3 rounded-xl border border-white/5 grid grid-cols-3 gap-2 text-center">
+          <div className="lg:col-span-6 xl:col-span-4 bg-slate-950/80 p-2 sm:p-3 rounded-xl border border-white/5 grid grid-cols-4 gap-1 text-center">
             <div className="border-r border-slate-800 py-1">
-              <span className="text-[9px] text-indigo-400 block font-black uppercase">10% Manager</span>
-              <span className="text-xs font-black text-indigo-300 font-mono block mt-1">
-                Rp {(Number(simulatedBailoutAmount) * 0.1).toLocaleString('id-ID')}
+              <span className="text-[8px] text-indigo-400 block font-black uppercase">10% MGR</span>
+              <span className="text-[10px] sm:text-xs font-black text-indigo-300 font-mono block mt-1">
+                Rp {Math.round(Number(simulatedBailoutAmount) * 0.1).toLocaleString('id-ID')}
               </span>
             </div>
             <div className="border-r border-slate-800 py-1">
-              <span className="text-[9px] text-fuchsia-400 block font-black uppercase">40% Marketing</span>
-              <span className="text-xs font-black text-fuchsia-300 font-mono block mt-1">
-                Rp {(Number(simulatedBailoutAmount) * 0.4).toLocaleString('id-ID')}
+              <span className="text-[8px] text-fuchsia-400 block font-black uppercase">15% MKT</span>
+              <span className="text-[10px] sm:text-xs font-black text-fuchsia-300 font-mono block mt-1">
+                Rp {Math.round(Number(simulatedBailoutAmount) * 0.15).toLocaleString('id-ID')}
+              </span>
+            </div>
+            <div className="border-r border-slate-800 py-1">
+              <span className="text-[8px] text-emerald-400 block font-black uppercase">25% APL</span>
+              <span className="text-[10px] sm:text-xs font-black text-emerald-300 font-mono block mt-1">
+                Rp {Math.round(Number(simulatedBailoutAmount) * 0.25).toLocaleString('id-ID')}
               </span>
             </div>
             <div className="py-1">
-              <span className="text-[9px] text-emerald-400 block font-black uppercase">50% Aplikator</span>
-              <span className="text-xs font-black text-emerald-300 font-mono block mt-1">
-                Rp {(Number(simulatedBailoutAmount) * 0.5).toLocaleString('id-ID')}
+              <span className="text-[8px] text-amber-400 block font-black uppercase">50% TAL</span>
+              <span className="text-[10px] sm:text-xs font-black text-amber-300 font-mono block mt-1">
+                Rp {Math.round(Number(simulatedBailoutAmount) * 0.50).toLocaleString('id-ID')}
               </span>
             </div>
           </div>
