@@ -109,7 +109,7 @@ export const MitraBayarLogo = ({
       {showText && !showCenteredText && (
         <div className="flex flex-col text-left leading-none">
           <span className={`text-base sm:text-lg font-black uppercase tracking-wider ${textColor}`}>MITRABAYAR</span>
-          <span className="text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest text-[#10d024] mt-0.5">Hadir Sebagai Pemberi Solusi</span>
+          <span className="text-[7.5px] sm:text-[8px] font-bold uppercase tracking-widest text-[#10d024] mt-0.5">Hadir Pemberi Solusi</span>
         </div>
       )}
 
@@ -117,7 +117,7 @@ export const MitraBayarLogo = ({
       {showCenteredText && (
         <div className="flex flex-col items-center text-center mt-3 leading-none">
           <span className={`text-2xl sm:text-3xl font-extrabold uppercase tracking-widest ${textColor}`}>MITRABAYAR</span>
-          <span className="text-[9.5px] sm:text-xs font-bold uppercase tracking-widest text-[#10d024] mt-2 tracking-[0.16em]">Hadir Sebagai Pemberi Solusi</span>
+          <span className="text-[9.5px] sm:text-xs font-bold uppercase tracking-widest text-[#10d024] mt-2 tracking-[0.16em]">Hadir Pemberi Solusi</span>
         </div>
       )}
     </div>
