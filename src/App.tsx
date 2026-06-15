@@ -870,7 +870,7 @@ const HowItWorks = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16 md:mb-20">
           <span className="inline-block py-1 px-3 rounded-full bg-blue-100 border border-blue-200 text-blue-700 font-semibold tracking-wider text-xs sm:text-sm mb-4">CARA CERDAS BEBAS DENDA</span>
-          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-[#0d2e5c]">Selamatkan Aset jaminan anda di Pembiayaan</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-[#0d2e5c]">Jangan remehkan Denda tagihan berjalan Anda</h2>
           <p className="text-slate-600 max-w-2xl mx-auto text-base sm:text-lg">4 Langkah mudah mengaktifkan Dana Sementara Anda.</p>
         </div>
 
