@@ -178,7 +178,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
                 <span className="text-xs px-3 py-1.5 bg-blue-50 text-blue-800 font-bold rounded-lg uppercase tracking-wider border border-blue-100 flex items-center gap-1">
                   <User size={13} />
                   {userRole === 'customer' 
-                    ? 'Kreditur' 
+                    ? 'Debitur/Peminjam' 
                     : userRole === 'marketing' 
                     ? 'Marketing Finance' 
                     : userRole === 'manager' 
@@ -241,7 +241,7 @@ const Header = ({ onOpenLogin, isLoggedIn, userRole, onLogout }: HeaderProps) =>
                 <span className="font-extrabold text-blue-700 uppercase tracking-wider flex items-center gap-1">
                   <User size={14} />
                   {userRole === 'customer' 
-                    ? 'Kreditur' 
+                    ? 'Debitur/Peminjam' 
                     : userRole === 'marketing' 
                     ? 'Marketing Finance' 
                     : userRole === 'manager' 
@@ -510,7 +510,7 @@ const HeroSection = ({ onOpenLogin }: { onOpenLogin: () => void }) => {
                       </div>
                       <div className="min-w-0">
                         <p className="text-[10.5px] font-black tracking-tighter text-[#1e293b] truncate" title="Rp 420.000">Rp 420.000</p>
-                        <p className="text-[7.5px] font-extrabold text-slate-450 leading-none mt-0.5">Saldo Kreditur</p>
+                        <p className="text-[7.5px] font-extrabold text-slate-450 leading-none mt-0.5">Saldo Debitur/Peminjam</p>
                       </div>
                     </div>
                   </div>
@@ -770,7 +770,7 @@ const ComparisonTable = () => {
 
             <div className="mt-8 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 text-center">
               <span className="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5">
-                🛡️ BPKB Aman, Unit Aman, Kendaraan Tetap Milik Anda
+                ��️ BPKB Aman, Unit Aman, Kendaraan Tetap Milik Anda
               </span>
             </div>
           </div>
@@ -1130,11 +1130,11 @@ const Requirements = () => {
                     {/* Quick Menu Icons Grid matches horizontal row in Holigo */}
                     <div className="grid grid-cols-5 gap-1 pt-1">
                       {[
-                        { icon: <span className="text-sm">🏨</span>, color: "bg-emerald-50 border-emerald-100", label: "Hotel" },
+                        { icon: <span className="text-sm">��</span>, color: "bg-emerald-50 border-emerald-100", label: "Hotel" },
                         { icon: <span className="text-sm">✈️</span>, color: "bg-sky-50 border-sky-100", label: "Pesawat" },
-                        { icon: <span className="text-sm">🚂</span>, color: "bg-blue-50 border-blue-100", label: "Kereta" },
-                        { icon: <span className="text-sm">📱</span>, color: "bg-orange-50 border-orange-100", label: "Pulsa" },
-                        { icon: <span className="text-sm">🧾</span>, color: "bg-amber-50 border-amber-100", label: "Tagihan" }
+                        { icon: <span className="text-sm">��</span>, color: "bg-blue-50 border-blue-100", label: "Kereta" },
+                        { icon: <span className="text-sm">��</span>, color: "bg-orange-50 border-orange-100", label: "Pulsa" },
+                        { icon: <span className="text-sm">��</span>, color: "bg-amber-50 border-amber-100", label: "Tagihan" }
                       ].map((item, i) => (
                         <motion.div 
                           whileHover={{ scale: 1.15, y: -2 }}
@@ -1422,12 +1422,12 @@ const Testimony = () => {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-200/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-12 text-center">
-        <span className="text-[#10d024] font-black tracking-widest uppercase text-xs sm:text-sm mb-3 block animate-pulse">Testimoni Kreditur</span>
+        <span className="text-[#10d024] font-black tracking-widest uppercase text-xs sm:text-sm mb-3 block animate-pulse">Testimoni Debitur/Peminjam</span>
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0d2e5c] tracking-tight leading-tight">
-          Ribuan Kreditur kami bantu penyelesaian Denda Tunggakan
+          Ribuan Debitur/Peminjam kami bantu penyelesaian Denda Tunggakan
         </h2>
         <p className="text-sm sm:text-base md:text-lg text-slate-500 max-w-2xl mx-auto mt-4 leading-relaxed font-normal">
-          Ribuan kreditur dari berbagai kota di Indonesia telah mengaktifkan fasilitas <strong className="text-[#0d2e5c]">Dana Sementara</strong> untuk menyelesaikan tunggakan denda darurat secara aman dan tepercaya.
+          Ribuan Debitur/Peminjam dari berbagai kota di Indonesia telah mengaktifkan fasilitas <strong className="text-[#0d2e5c]">Dana Sementara</strong> untuk menyelesaikan tunggakan denda darurat secara aman dan tepercaya.
         </p>
       </div>
 

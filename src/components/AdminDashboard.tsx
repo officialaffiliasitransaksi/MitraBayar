@@ -46,14 +46,14 @@ interface AdminDashboardProps {
 }
 
 export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashboardProps) {
-  const [activeSubTab, setActiveSubTab] = useState<'kreditur' | 'marketing' | 'config' | 'logs'>('kreditur');
+  const [activeSubTab, setActiveSubTab] = useState<'debitur/peminjam' | 'marketing' | 'config' | 'logs'>('debitur/peminjam');
   const [customers, setCustomers] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
   const [commissions, setCommissions] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([
     { id: 1, time: 'Baru saja', user: 'SYSTEM', detail: 'Admin Panel diinisialisasi oleh ' + adminIdentifier, type: 'info' },
-    { id: 2, time: '10 menit yang lalu', user: 'MGR-9902', detail: 'Mengakses data evaluasi denda kreditur Farhan Azis', type: 'info' },
-    { id: 3, time: '2 jam yang lalu', user: 'MB-7789', detail: 'Mendaftarkan kreditur baru Budi Santoso', type: 'success' },
+    { id: 2, time: '10 menit yang lalu', user: 'MGR-9902', detail: 'Mengakses data evaluasi denda debitur/peminjam Farhan Azis', type: 'info' },
+    { id: 3, time: '2 jam yang lalu', user: 'MB-7789', detail: 'Mendaftarkan debitur/peminjam baru Budi Santoso', type: 'success' },
     { id: 4, time: '4 jam yang lalu', user: 'SYSTEM', detail: 'Pencadangan rutin data backup ke Firestore selesai', type: 'success' },
   ]);
 
@@ -75,19 +75,19 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
   });
 
   // UI inputs
-  const [searchKreditur, setSearchKreditur] = useState('');
+  const [searchDebitur, setSearchDebitur] = useState('');
   const [searchMarketing, setSearchMarketing] = useState('');
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // New Creditor Modal / Form states
-  const [showAddKreditur, setShowAddKreditur] = useState(false);
-  const [newKrediturName, setNewKrediturName] = useState('');
-  const [newKrediturPhone, setNewKrediturPhone] = useState('');
-  const [newKrediturLease, setNewKrediturLease] = useState('FIF Group');
-  const [newKrediturUnit, setNewKrediturUnit] = useState('');
-  const [newKrediturInstallment, setNewKrediturInstallment] = useState('');
-  const [newKrediturStatus, setNewKrediturStatus] = useState('Aktif Terlindungi');
+  const [showAddDebitur, setShowAddDebitur] = useState(false);
+  const [newDebiturName, setNewDebiturName] = useState('');
+  const [newDebiturPhone, setNewDebiturPhone] = useState('');
+  const [newDebiturLease, setNewDebiturLease] = useState('FIF Group');
+  const [newDebiturUnit, setNewDebiturUnit] = useState('');
+  const [newDebiturInstallment, setNewDebiturInstallment] = useState('');
+  const [newDebiturStatus, setNewDebiturStatus] = useState('Aktif Terlindungi');
 
   // New Marketing Agent Bonus controller
   const [bonusAmount, setBonusAmount] = useState('50000');
@@ -164,12 +164,12 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
     setTimeout(() => setSuccessMsg(null), 3000);
   };
 
-  const handleDeleteKreditur = async (id: string, name: string) => {
-    if (confirm(`Apakah Anda yakin ingin menghapus data kreditur ${name}?`)) {
+  const handleDeleteDebitur = async (id: string, name: string) => {
+    if (confirm(`Apakah Anda yakin ingin menghapus data debitur/peminjam ${name}?`)) {
       try {
         await deleteDoc(doc(db, 'customers', id));
-        setSuccessMsg(`Kreditur ${name} berhasil dihapus dari sistem.`);
-        addLog(`Menghapus kreditur ${name} (ID: ${id})`, 'warning');
+        setSuccessMsg(`Debitur/Peminjam ${name} berhasil dihapus dari sistem.`);
+        addLog(`Menghapus debitur/peminjam ${name} (ID: ${id})`, 'warning');
         setTimeout(() => setSuccessMsg(null), 3000);
       } catch (err) {
         setErrorMsg('Gagal menghapus data dari Firestore.');
@@ -230,7 +230,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
         status: 'Aktif Terlindungi'
       });
 
-      addLog(`Menyalurkan bailout langsung untuk kreditur ${cust.name} sebesar Rp ${parseAmount(cust.amount).toLocaleString('id-ID')}`, 'success');
+      addLog(`Menyalurkan bailout langsung untuk debitur/peminjam ${cust.name} sebesar Rp ${parseAmount(cust.amount).toLocaleString('id-ID')}`, 'success');
       setSuccessMsg(`Dana talangan untuk ${cust.name} berhasil dicairkan otomatis!`);
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err) {
@@ -239,10 +239,10 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
     }
   };
 
-  const handleAddKreditur = async (e: React.FormEvent) => {
+  const handleAddDebitur = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newKrediturName || !newKrediturPhone || !newKrediturUnit || !newKrediturInstallment) {
-      setErrorMsg('Harap lengkapi seluruh kolom formulir kreditur.');
+    if (!newDebiturName || !newDebiturPhone || !newDebiturUnit || !newDebiturInstallment) {
+      setErrorMsg('Harap lengkapi seluruh kolom formulir debitur/peminjam.');
       setTimeout(() => setErrorMsg(null), 3000);
       return;
     }
@@ -250,28 +250,28 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
     try {
       const generatedId = String(Date.now());
       await setDoc(doc(db, 'customers', generatedId), {
-        name: newKrediturName,
-        phone: newKrediturPhone,
-        lease: newKrediturLease,
-        unit: newKrediturUnit,
-        installment: newKrediturInstallment.startsWith('Rp') ? newKrediturInstallment : `Rp ${Number(newKrediturInstallment).toLocaleString('id-ID')}`,
-        status: newKrediturStatus,
+        name: newDebiturName,
+        phone: newDebiturPhone,
+        lease: newDebiturLease,
+        unit: newDebiturUnit,
+        installment: newDebiturInstallment.startsWith('Rp') ? newDebiturInstallment : `Rp ${Number(newDebiturInstallment).toLocaleString('id-ID')}`,
+        status: newDebiturStatus,
         marketingId: 'MB-7789',
         createdAt: new Date().toISOString()
       });
 
-      setSuccessMsg(`Kreditur ${newKrediturName} berhasil didaftarkan langsung oleh Admin.`);
-      addLog(`Mendaftarkan kreditur baru: ${newKrediturName}`, 'success');
+      setSuccessMsg(`Debitur/Peminjam ${newDebiturName} berhasil didaftarkan langsung oleh Admin.`);
+      addLog(`Mendaftarkan debitur/peminjam baru: ${newDebiturName}`, 'success');
       
       // Reset
-      setNewKrediturName('');
-      setNewKrediturPhone('');
-      setNewKrediturUnit('');
-      setNewKrediturInstallment('');
-      setShowAddKreditur(false);
+      setNewDebiturName('');
+      setNewDebiturPhone('');
+      setNewDebiturUnit('');
+      setNewDebiturInstallment('');
+      setShowAddDebitur(false);
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err) {
-      setErrorMsg('Gagal menambahkan data kreditur baru.');
+      setErrorMsg('Gagal menambahkan data debitur/peminjam baru.');
       setTimeout(() => setErrorMsg(null), 3000);
     }
   };
@@ -294,10 +294,10 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
     return Number(String(val).replace(/[^0-9]/g, '')) || 0;
   };
 
-  // 1. Jumlah Kreditur (Count of protected creditors/debitors)
-  const totalKreditur = customers.length;
-  const activeKrediturs = customers.filter(c => c.status === 'Aktif Terlindungi').length;
-  const globalKrediturCount = 18420 + customers.length; // Ilustrasi secara global nasional
+  // 1. Jumlah Debitur/Peminjam (Count of protected creditors/debitors)
+  const totalDebitur = customers.length;
+  const activeDebiturs = customers.filter(c => c.status === 'Aktif Terlindungi').length;
+  const globalDebiturCount = 18420 + customers.length; // Ilustrasi secara global nasional
 
   // 2. Jumlah Marketing Finance (Count of active marketing agents)
   const totalMarketingFinanceCount = 14 + (customers.filter(c => c.marketingId && c.marketingId !== 'MB-7789').length);
@@ -490,20 +490,20 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           
-          {/* Card 5: Jumlah Kreditur */}
+          {/* Card 5: Jumlah Debitur/Peminjam */}
           <div className="p-5 bg-white border border-slate-100 rounded-3xl shadow-sm flex flex-col justify-between hover:shadow-md transition">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">Jumlah Kreditur</span>
+              <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">Jumlah Debitur/Peminjam</span>
               <span className="p-1.5 bg-blue-50 text-blue-600 rounded-lg"><Users size={15} /></span>
             </div>
             <div className="mt-3.5 space-y-1">
               <div>
-                <span className="text-[9px] text-slate-400 font-black block uppercase">Kreditur Global (Ilustrasi)</span>
-                <span className="text-xl font-black text-slate-900 font-sans">{globalKrediturCount.toLocaleString('id-ID')} Jiwa</span>
+                <span className="text-[9px] text-slate-400 font-black block uppercase">Debitur/Peminjam Global (Ilustrasi)</span>
+                <span className="text-xl font-black text-slate-900 font-sans">{globalDebiturCount.toLocaleString('id-ID')} Jiwa</span>
               </div>
               <div className="border-t border-slate-100 pt-1">
                 <span className="text-[9px] text-slate-400 font-black block uppercase">Aktif Terlindungi (Lokal)</span>
-                <span className="text-xs font-bold text-blue-600">{activeKrediturs} dari {totalKreditur} Kreditur</span>
+                <span className="text-xs font-bold text-blue-600">{activeDebiturs} dari {totalDebitur} Debitur/Peminjam</span>
               </div>
             </div>
           </div>
@@ -641,7 +641,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                 </div>
                 <h4 className="text-xs font-extrabold text-fuchsia-150 mt-2 m-0">Marketing Finance Agent</h4>
                 <p className="text-[11px] text-slate-300 mt-1 mb-0 leading-relaxed">
-                  Disalurkan kepada mitra marketing lapangan yang merekrut secara langsung (direct referral) kreditur dan melakukan kunjungan.
+                  Disalurkan kepada mitra marketing lapangan yang merekrut secara langsung (direct referral) debitur/peminjam dan melakukan kunjungan.
                 </p>
               </div>
               <div className="mt-3 border-t border-fuchsia-500/20 pt-2 flex justify-between items-end">
@@ -782,7 +782,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
           }`}
         >
           <Users size={16} />
-          <span>Manajemen Kreditur & Klaim</span>
+          <span>Manajemen Debitur/Peminjam & Klaim</span>
         </button>
 
         <button
@@ -836,7 +836,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
                     <span>Antrean Pengajuan Bantuan Dana Darurat</span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-semibold mt-0.5">Memerlukan validasi, otorisasi skor kreditur, dan pencairan dana langsung</p>
+                  <p className="text-xs text-slate-500 font-semibold mt-0.5">Memerlukan validasi, otorisasi skor debitur/peminjam, dan pencairan dana langsung</p>
                 </div>
               </div>
 
@@ -849,7 +849,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                   <table className="w-full text-left text-xs bg-white border border-slate-100 rounded-xl overflow-hidden shadow-xs">
                     <thead>
                       <tr className="border-b border-slate-150 bg-slate-50 font-black text-slate-500 uppercase text-[9px] tracking-wider">
-                        <th className="py-3.5 px-4 font-black">Identitas Kreditur</th>
+                        <th className="py-3.5 px-4 font-black">Identitas Debitur/Peminjam</th>
                         <th className="py-3.5 px-3 font-black">Detail Leasing & Kendaraan</th>
                         <th className="py-3.5 px-3 font-black">Besaran Angsuran</th>
                         <th className="py-3.5 px-3 font-black">Keterlambatan/Alasan</th>
@@ -928,7 +928,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
               <div>
                 <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                   <span className="p-1.5 bg-indigo-50 text-indigo-600 rounded-xl"><Sparkles size={16} /></span>
-                  <span>Kreditur Layak Rekomendasi (Masuk Kualifikasi Dana Talangan)</span>
+                  <span>Debitur/Peminjam Layak Rekomendasi (Masuk Kualifikasi Dana Talangan)</span>
                 </h3>
                 <p className="text-xs text-slate-500 font-semibold mt-0.5">
                   Daftar debitur dengan skor kelayakan optimal <strong className="text-emerald-600">(&ge; 75/100 Poin)</strong> yang memenuhi syarat operasional penyaluran emergency bailout denda/angsuran Mitra Bayar
@@ -937,7 +937,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
 
               {qualifiedCreditorsList.length === 0 ? (
                 <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="text-xs font-bold text-slate-400">Tidak ada kreditur berkualifikasi tinggi yang membutuhkan penanganan saat ini.</p>
+                  <p className="text-xs font-bold text-slate-400">Tidak ada debitur/peminjam berkualifikasi tinggi yang membutuhkan penanganan saat ini.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1003,7 +1003,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                     <Users size={20} className="text-indigo-600" />
-                    <span>Database Kreditur Terdaftar</span>
+                    <span>Database Debitur/Peminjam Terdaftar</span>
                   </h3>
                   <p className="text-xs text-slate-500 font-semibold mt-0.5">Seluruh debitur di bawah proteksi jaminan program Mitra Bayar</p>
                 </div>
@@ -1014,41 +1014,41 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
                     <input
                       type="text"
-                      placeholder="Cari kreditur..."
-                      value={searchKreditur}
-                      onChange={(e) => setSearchKreditur(e.target.value)}
+                      placeholder="Cari debitur/peminjam..."
+                      value={searchDebitur}
+                      onChange={(e) => setSearchDebitur(e.target.value)}
                       className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs font-semibold"
                     />
                   </div>
 
                   {/* Add button */}
                   <button
-                    onClick={() => setShowAddKreditur(!showAddKreditur)}
+                    onClick={() => setShowAddDebitur(!showAddDebitur)}
                     className="p-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
                   >
-                    {showAddKreditur ? <X size={14} /> : <Plus size={14} />}
-                    <span>{showAddKreditur ? 'Batal' : 'Kreditur Baru'}</span>
+                    {showAddDebitur ? <X size={14} /> : <Plus size={14} />}
+                    <span>{showAddDebitur ? 'Batal' : 'Debitur/Peminjam Baru'}</span>
                   </button>
                 </div>
               </div>
 
               {/* Add form panel */}
-              {showAddKreditur && (
-                <form onSubmit={handleAddKreditur} className="p-5.5 bg-slate-50 border border-slate-150 rounded-2xl gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {showAddDebitur && (
+                <form onSubmit={handleAddDebitur} className="p-5.5 bg-slate-50 border border-slate-150 rounded-2xl gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="sm:col-span-2 lg:col-span-3 pb-2 border-b border-slate-200">
                     <span className="text-xs font-black text-indigo-900 uppercase tracking-widest flex items-center gap-1">
-                      <Plus size={15} /> Form Pendaftaran Kreditur Mandiri
+                      <Plus size={15} /> Form Pendaftaran Debitur/Peminjam Mandiri
                     </span>
                   </div>
                   
                   <div>
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">Nama Kreditur</label>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">Nama Debitur/Peminjam</label>
                     <input
                       type="text"
                       required
                       placeholder="Budi Santoso"
-                      value={newKrediturName}
-                      onChange={(e) => setNewKrediturName(e.target.value)}
+                      value={newDebiturName}
+                      onChange={(e) => setNewDebiturName(e.target.value)}
                       className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs outline-none"
                     />
                   </div>
@@ -1059,8 +1059,8 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                       type="tel"
                       required
                       placeholder="081299881122"
-                      value={newKrediturPhone}
-                      onChange={(e) => setNewKrediturPhone(e.target.value.replace(/\D/g,''))}
+                      value={newDebiturPhone}
+                      onChange={(e) => setNewDebiturPhone(e.target.value.replace(/\D/g,''))}
                       className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none"
                     />
                   </div>
@@ -1068,8 +1068,8 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">Penyedia Kredit (Leasing)</label>
                     <select
-                      value={newKrediturLease}
-                      onChange={(e) => setNewKrediturLease(e.target.value)}
+                      value={newDebiturLease}
+                      onChange={(e) => setNewDebiturLease(e.target.value)}
                       className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs cursor-pointer outline-none"
                     >
                       <option value="FIF Group">FIF Group</option>
@@ -1087,8 +1087,8 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                       type="text"
                       required
                       placeholder="Honda Vario 160 (2023)"
-                      value={newKrediturUnit}
-                      onChange={(e) => setNewKrediturUnit(e.target.value)}
+                      value={newDebiturUnit}
+                      onChange={(e) => setNewDebiturUnit(e.target.value)}
                       className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-semibold text-xs outline-none"
                     />
                   </div>
@@ -1099,8 +1099,8 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                       type="number"
                       required
                       placeholder="850000"
-                      value={newKrediturInstallment}
-                      onChange={(e) => setNewKrediturInstallment(e.target.value)}
+                      value={newDebiturInstallment}
+                      onChange={(e) => setNewDebiturInstallment(e.target.value)}
                       className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs outline-none"
                     />
                   </div>
@@ -1108,8 +1108,8 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                   <div>
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">Status Proteksi Awal</label>
                     <select
-                      value={newKrediturStatus}
-                      onChange={(e) => setNewKrediturStatus(e.target.value)}
+                      value={newDebiturStatus}
+                      onChange={(e) => setNewDebiturStatus(e.target.value)}
                       className="w-full p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs cursor-pointer outline-none"
                     >
                       <option value="Aktif Terlindungi">Aktif Terlindungi</option>
@@ -1124,13 +1124,13 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                       className="p-2.5 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
                     >
                       <Check size={14} />
-                      <span>Simpan Kreditur</span>
+                      <span>Simpan Debitur/Peminjam</span>
                     </button>
                   </div>
                 </form>
               )}
 
-              {/* Krediturs list */}
+              {/* Debitur/Peminjams list */}
               {customers.length === 0 ? (
                 <div className="text-center p-12 bg-slate-50 rounded-2xl border border-slate-100">
                   <p className="text-xs font-bold text-slate-500">Mencari data...</p>
@@ -1140,7 +1140,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                   <table className="w-full text-left text-xs bg-white border border-slate-100 rounded-xl overflow-hidden shadow-xs">
                     <thead>
                       <tr className="border-b border-slate-150 bg-slate-50 font-black text-slate-500 uppercase text-[9px] tracking-wider">
-                        <th className="py-3 px-4 font-black">Nama Kreditur</th>
+                        <th className="py-3 px-4 font-black">Nama Debitur/Peminjam</th>
                         <th className="py-3 px-3 font-black">Kontak Handphone</th>
                         <th className="py-3 px-3 font-black">Lembaga Kredit (Leasing)</th>
                         <th className="py-3 px-3 font-black">Spesifikasi Unit Aset</th>
@@ -1152,7 +1152,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                     <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
                       {customers
                         .filter(c => {
-                          const keyword = searchKreditur.toLowerCase();
+                          const keyword = searchDebitur.toLowerCase();
                           return c.name?.toLowerCase().includes(keyword) || 
                                  c.lease?.toLowerCase().includes(keyword) || 
                                  c.phone?.includes(keyword) || 
@@ -1180,9 +1180,9 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                             </td>
                             <td className="py-3.5 px-3 text-center">
                               <button
-                                onClick={() => handleDeleteKreditur(String(c.id), c.name)}
+                                onClick={() => handleDeleteDebitur(String(c.id), c.name)}
                                 className="p-1 px-2 text-red-650 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center"
-                                title="Hapus kreditur"
+                                title="Hapus debitur/peminjam"
                                 id={`del-${c.id}`}
                               >
                                 <Trash2 size={13} />
@@ -1263,7 +1263,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
                       <th className="py-3 px-3 font-black">Nama Partner</th>
                       <th className="py-3 px-3 font-black">Region Kerja</th>
                       <th className="py-3 px-3 font-black">Lisensi Tingkatan (Tier)</th>
-                      <th className="py-3 px-3 font-black">Kreditur Direkrut</th>
+                      <th className="py-3 px-3 font-black">Debitur/Peminjam Direkrut</th>
                       <th className="py-3 px-3 font-black">Tanggal Bergabung</th>
                       <th className="py-3 px-3 font-black">Status Afiliasi</th>
                     </tr>
@@ -1370,7 +1370,7 @@ export default function AdminDashboard({ adminIdentifier, onLogout }: AdminDashb
               <div className="p-4 bg-slate-50 border border-slate-150 rounded-2xl flex items-center justify-between">
                 <div className="space-y-0.5">
                   <span className="text-[11px] font-black text-slate-800 uppercase tracking-wide block">Siklus Penjagaan Denda Otomatis</span>
-                  <span className="text-[10px] text-slate-400 block font-semibold leading-relaxed">Verifikasi denda & slip pembayaran kreditur tanpa tunggu persetujuan manual</span>
+                  <span className="text-[10px] text-slate-400 block font-semibold leading-relaxed">Verifikasi denda & slip pembayaran debitur/peminjam tanpa tunggu persetujuan manual</span>
                 </div>
                 <input
                   type="checkbox"

@@ -189,7 +189,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
             }`}
           >
             <Smartphone size={15} />
-            <span>Kreditur</span>
+            <span>Debitur/Peminjam</span>
           </button>
           
           <button

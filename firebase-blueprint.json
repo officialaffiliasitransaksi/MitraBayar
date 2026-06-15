@@ -29,6 +29,22 @@
           "type": "string",
           "description": "Active protection status"
         },
+        "debtStatus": {
+          "type": "string",
+          "description": "Debt status: Belum Lunas, Masa Pelunasan, Lunas"
+        },
+        "remainingDebt": {
+          "type": "number",
+          "description": "Remaining outstanding debt amount in IDR"
+        },
+        "bpkbStatus": {
+          "type": "string",
+          "description": "BPKB withholding status: Noted (Ditahan), Released (Diserahkan)"
+        },
+        "invoiceClaimCreated": {
+          "type": "boolean",
+          "description": "Indicates if automatically created claim invoice is active"
+        },
         "marketingId": {
           "type": "string",
           "description": "ID of the marketing agent who registered this customer"
