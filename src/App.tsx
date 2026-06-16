@@ -680,6 +680,25 @@ const HeroSection = ({ onOpenLogin }: { onOpenLogin: () => void }) => {
     </section>
   );
 };
+const financeCompanies = [
+  { name: "ADIRA FINANCE", type: "leasing" },
+  { name: "FIFGROUP", type: "leasing & motor" },
+  { name: "BUSSAN AUTO FINANCE (BAF)", type: "motor & elektronik" },
+  { name: "BCA FINANCE", type: "mobil & motor" },
+  { name: "WOM FINANCE", type: "multifinance" },
+  { name: "MANDIRI UTAMA FINANCE (MUF)", type: "multifinance" },
+  { name: "OTO MULTIARTHA", type: "mobil" },
+  { name: "ASTRA CREDIT COMPANIES (ACC)", type: "mobil & multiguna" },
+  { name: "TOYOTA ASTRA FINANCIAL SERVICES (TAF)", type: "mobil" },
+  { name: "MEGA AUTO FINANCE (MAF)", type: "motor" },
+  { name: "INDOMOBIL FINANCE (IMFI)", type: "multifinance" },
+  { name: "CLIPAN FINANCE", type: "mobil" },
+  { name: "SMART MULTI FINANCE", type: "multifinance" },
+  { name: "RADANA FINANCE", type: "leasing" },
+  { name: "SUZUKI FINANCE", type: "mobil & motor" },
+  { name: "MEGA CENTRAL FINANCE (MCF)", type: "motor" }
+];
+
 const ComparisonTable = () => {
   const points = [
     {
@@ -718,10 +737,31 @@ const ComparisonTable = () => {
         
         {/* Header */}
         <div className="text-center mb-16 md:mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-700 text-xs font-semibold tracking-wider uppercase mb-4 shadow-3xs">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-700 text-xs font-semibold tracking-wider uppercase mb-5 shadow-3xs">
             <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
-            Aset & Proteksi Finansial
+            Kami telah bekerjasama
           </div>
+
+          {/* Running Logo Pembiayaan / Finance */}
+          <div className="relative w-full overflow-hidden flex py-4 bg-white/40 backdrop-blur-xs border-y border-slate-200/60 mb-8 mt-2">
+            <div className="animate-marquee flex gap-6 whitespace-nowrap items-center">
+              {financeCompanies.map((comp, idx) => (
+                <div key={`comp-1-${idx}`} className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl border border-slate-150/60 shadow-3xs">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                  <span className="font-extrabold text-xs text-slate-800 tracking-wide">{comp.name}</span>
+                  <span className="text-[9px] bg-slate-100 text-slate-500 font-bold px-1.5 py-0.5 rounded uppercase">{comp.type}</span>
+                </div>
+              ))}
+              {financeCompanies.map((comp, idx) => (
+                <div key={`comp-2-${idx}`} className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl border border-slate-150/60 shadow-3xs">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                  <span className="font-extrabold text-xs text-slate-800 tracking-wide">{comp.name}</span>
+                  <span className="text-[9px] bg-slate-100 text-slate-500 font-bold px-1.5 py-0.5 rounded uppercase">{comp.type}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0d2e5c] tracking-tight leading-tight">
             Tradisional <span className="text-slate-400 font-light">vs.</span> Solusi Mitra Bayar
           </h2>
