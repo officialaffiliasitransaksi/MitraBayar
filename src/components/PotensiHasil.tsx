@@ -12,7 +12,8 @@ import {
   Sparkles, 
   CheckCircle,
   HelpCircle,
-  Award
+  Award,
+  Car
 } from 'lucide-react';
 
 export default function PotensiHasil() {
@@ -20,6 +21,11 @@ export default function PotensiHasil() {
   const [totalUserTarget, setTotalUserTarget] = useState(1000000); // 1 Million total download target
   const [penetrationRate, setPenetrationRate] = useState(10); // 10% penetration rate default
   const [txCount, setTxCount] = useState<string>('10'); // Default to 10 transactions (perfect score)
+  
+  // Installment Illustration State
+  const [vehicleType, setVehicleType] = useState<'motor' | 'mobil'>('motor');
+  const [angsuranAmount, setAngsuranAmount] = useState<string>('750000');
+  const [tenorMonths, setTenorMonths] = useState<string>('12');
   
   // Calculate debiturs
   const activeDebitur = Math.round((totalUserTarget * penetrationRate) / 100);
@@ -658,6 +664,303 @@ export default function PotensiHasil() {
                     <div className="col-span-2 text-right font-black text-indigo-700 font-mono">Rp 7.500.000</div>
                   </div>
 
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* ILUSTRASI PEMBAYARAN ANGSURAN MOTOR & MOBIL */}
+        <div id="ilustrasi-angsuran" className="bg-white border border-slate-150 rounded-3xl p-6 sm:p-10 shadow-lg mb-16 space-y-8 text-left relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 mt-10 mr-10 rounded-full blur-2xl pointer-events-none opacity-40"></div>
+          
+          <div className="border-b border-slate-100 pb-5">
+            <span className="inline-flex items-center gap-1.5 text-[10px] bg-indigo-50 text-indigo-750 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+              <CreditCard size={12} className="text-indigo-600" /> SIMULATOR TRANSAKSI ANGSURAN
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black text-[#0d2e5c]">
+              Ilustrasi Pembayaran Angsuran Khusus Motor & Mobil
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 flex items-center gap-1.5">
+              <span>Perhitungan rincian pembayaran angsuran kredit kendaraan dengan biaya administrasi tetap sebesar</span>
+              <strong className="text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-105 font-black text-xs">Rp 25.000</strong>
+              <span>per transaksi.</span>
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            
+            {/* Input Configurator (Col-4) */}
+            <div className="lg:col-span-5 bg-slate-50/70 p-6 rounded-2xl border border-slate-100 flex flex-col justify-between gap-6">
+              <div className="space-y-5">
+                
+                {/* Vehicle Type Selection */}
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2.5">
+                    1. Pilih Jenis Kendaraan Pembiayaan
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      id="btn-vehicle-motor"
+                      type="button"
+                      onClick={() => {
+                        setVehicleType('motor');
+                        setAngsuranAmount('750000');
+                      }}
+                      className={`py-3 px-4 rounded-xl font-bold text-sm tracking-tight flex items-center justify-center gap-2.5 transition-all cursor-pointer border ${
+                        vehicleType === 'motor'
+                          ? 'bg-[#0d2e5c] text-white border-[#0d2e5c] shadow-md shadow-slate-905/20'
+                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>🛵 Motor (Roda Dua)</span>
+                    </button>
+                    <button
+                      id="btn-vehicle-mobil"
+                      type="button"
+                      onClick={() => {
+                        setVehicleType('mobil');
+                        setAngsuranAmount('3500000');
+                      }}
+                      className={`py-3 px-4 rounded-xl font-bold text-sm tracking-tight flex items-center justify-center gap-2.5 transition-all cursor-pointer border ${
+                        vehicleType === 'mobil'
+                          ? 'bg-[#0d2e5c] text-white border-[#0d2e5c] shadow-md shadow-slate-905/20'
+                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>🚗 Mobil (Roda Empat)</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Local Presets depending on Vehicle Type */}
+                <div>
+                  <span className="block text-[10px] font-bold text-slate-450 uppercase mb-2">
+                    {vehicleType === 'motor' ? 'Preset Motor Populer:' : 'Preset Mobil Populer:'}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {vehicleType === 'motor' ? (
+                      <>
+                        <button
+                          id="preset-motor-beat"
+                          type="button"
+                          onClick={() => setAngsuranAmount('720000')}
+                          className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                            angsuranAmount === '720000'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200 font-extrabold'
+                              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          Honda Beat (Rp 720K)
+                        </button>
+                        <button
+                          id="preset-motor-vario"
+                          type="button"
+                          onClick={() => setAngsuranAmount('980000')}
+                          className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                            angsuranAmount === '980000'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200 font-extrabold'
+                              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          Vario 160 (Rp 980K)
+                        </button>
+                        <button
+                          id="preset-motor-nmax"
+                          type="button"
+                          onClick={() => setAngsuranAmount('1250000')}
+                          className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                            angsuranAmount === '1250000'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200 font-extrabold'
+                              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          NMAX 155 (Rp 1.25M)
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          id="preset-mobil-brio"
+                          type="button"
+                          onClick={() => setAngsuranAmount('2650000')}
+                          className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                            angsuranAmount === '2650000'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200 font-extrabold'
+                              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          Honda Brio (Rp 2.65M)
+                        </button>
+                        <button
+                          id="preset-mobil-avanza"
+                          type="button"
+                          onClick={() => setAngsuranAmount('3850000')}
+                          className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                            angsuranAmount === '3850000'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200 font-extrabold'
+                              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          Toyota Avanza (Rp 3.85M)
+                        </button>
+                        <button
+                          id="preset-mobil-xpander"
+                          type="button"
+                          onClick={() => setAngsuranAmount('4500000')}
+                          className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                            angsuranAmount === '4500000'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200 font-extrabold'
+                              : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'
+                          }`}
+                        >
+                          Xpander (Rp 4.5M)
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Manual Installment Amount input */}
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">
+                    2. Nominal Angsuran Pokok Bulanan (Rp)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                    <input
+                      id="input-angsuran-pokok"
+                      type="number"
+                      min="10000"
+                      max="100000000"
+                      step="50000"
+                      value={angsuranAmount}
+                      onChange={(e) => setAngsuranAmount(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 bg-white border border-slate-250 rounded-xl font-bold text-slate-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Tenor / Duration selection */}
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                      3. Tenor Kredit Yang Ingin Dihitung
+                    </label>
+                    <span className="text-xs font-extrabold text-indigo-700 font-mono bg-indigo-50 px-2 py-0.5 rounded-md">{tenorMonths} Bulan</span>
+                  </div>
+                  <input
+                    id="input-installment-tenor"
+                    type="range"
+                    min="1"
+                    max="60"
+                    value={tenorMonths}
+                    onChange={(e) => setTenorMonths(e.target.value)}
+                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-700"
+                  />
+                  <div className="flex justify-between text-[9px] font-bold text-slate-400 px-1 mt-1">
+                    <span>1 Bln</span>
+                    <span>12 Bln</span>
+                    <span>24 Bln</span>
+                    <span>36 Bln</span>
+                    <span>48 Bln</span>
+                    <span>60 Bln</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="p-4 bg-[#eff6ff] border border-blue-150 rounded-2xl text-[11px] text-blue-900 leading-relaxed font-semibold">
+                🔔 <strong className="text-blue-800">Skema Transaksi Sehat:</strong> Pembayaran dilakukan langsung via jaringan kasir pintar MitraBayar, menekan denda bunga berbunga hingga 0% karena terintegrasi langsung ke host leasing bersangkutan.
+              </div>
+            </div>
+
+            {/* Calculations Breakdown (Col-7 in grid) */}
+            <div className="lg:col-span-7 flex flex-col justify-between gap-6">
+              
+              {/* Output Columns details */}
+              <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-md space-y-6 flex-1 flex flex-col justify-between">
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center pb-3 border-b border-white/10">
+                    <div>
+                      <h4 className="text-sm font-extrabold font-sans">Estimasi Invoice Resmi Transaksi</h4>
+                      <p className="text-[10px] text-slate-400">Format tagihan tag-system bergaransi MitraBayar</p>
+                    </div>
+                    <span className="text-[10px] bg-indigo-500 text-white font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                      {vehicleType === 'motor' ? '🏍️ Roda Dua' : '🚗 Roda Empat'}
+                    </span>
+                  </div>
+
+                  {/* Calculations Block */}
+                  <div className="space-y-3.5 text-xs">
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>Angsuran Pokok Bulanan</span>
+                      <span className="font-mono font-bold">
+                        Rp {(parseFloat(angsuranAmount) || 0).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center text-slate-300">
+                      <div className="flex items-center gap-1.5">
+                        <span>Biaya Administrasi Transaksi</span>
+                        <span className="bg-blue-600/35 border border-blue-500/40 text-blue-300 font-extrabold px-1.5 py-0.5 rounded text-[8.5px] uppercase tracking-wide">FIXED RATE</span>
+                      </div>
+                      <span className="font-mono font-bold text-emerald-400">
+                        Rp 25.000
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2.5 border-t border-white/5 font-extrabold text-[#93c5fd]">
+                      <span>Kontribusi Pembayaran Per Bulan</span>
+                      <span className="font-mono text-base text-blue-300">
+                        Rp {((parseFloat(angsuranAmount) || 0) + 25000).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center text-slate-300">
+                      <span>Proyeksi Tenor Terpilih</span>
+                      <span className="font-mono font-black text-indigo-300">
+                        {tenorMonths} Bulan
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Full Term Block */}
+                <div className="p-4 bg-white/5 border border-white/10 rounded-xl space-y-2 mt-4">
+                  <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold block">
+                    TOTAL AKUMULASI SELAMA TENOR ({tenorMonths} BULAN)
+                  </span>
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-xs text-slate-300">Hubungan Angsuran + Admin</span>
+                    <span className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
+                      Rp {(((parseFloat(angsuranAmount) || 0) + 25000) * (parseInt(tenorMonths) || 1)).toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-450 leading-relaxed font-medium pt-1.5 border-t border-white/5">
+                    Rincian: Pokok (Rp {((parseFloat(angsuranAmount) || 0) * (parseInt(tenorMonths) || 1)).toLocaleString('id-ID')}) + Total Administrasi (Rp {(25000 * (parseInt(tenorMonths) || 1)).toLocaleString('id-ID')}).
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Unique Features Comparison Grid for MitraBayar Fixed rate */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border border-slate-150 p-4 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-colors flex items-start gap-3">
+                  <span className="text-xl shrink-0">🛡️</span>
+                  <div>
+                    <h5 className="font-extrabold text-slate-800 text-xs">Biaya Admin Fixed Rp 25K</h5>
+                    <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5">Berbeda dari loket lain yang membebankan biaya komisi ganda tersembunyi, di MitraBayar biaya admin rata dan resmi.</p>
+                  </div>
+                </div>
+                <div className="border border-slate-150 p-4 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition-colors flex items-start gap-3">
+                  <span className="text-xl shrink-0">📈</span>
+                  <div>
+                    <h5 className="font-extrabold text-slate-800 text-xs">Siklus Perlindungan Otomatis</h5>
+                    <p className="text-[10.5px] text-slate-500 leading-relaxed mt-0.5">Tiap pembayaran yang diinput langsung berkontribusi pada poin kelayakan skor talangan dana denda Anda.</p>
+                  </div>
                 </div>
               </div>
 
